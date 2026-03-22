@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Expense, Category, Period } from '../types';
 import { getExpenses, addExpense as addExpenseToStorage, addExpensesBatch as addExpensesBatchToStorage, updateExpense as updateExpenseInStorage, deleteExpense as deleteExpenseFromStorage } from '../lib/storage';
 
-function getPeriodStart(period: Period, monthStartDay: number = 1): Date {
+export function getPeriodStart(period: Period, monthStartDay: number = 1): Date {
   const now = new Date();
   switch (period) {
     case 'daily':
@@ -22,7 +22,7 @@ function getPeriodStart(period: Period, monthStartDay: number = 1): Date {
   }
 }
 
-function getPeriodEnd(period: Period, monthStartDay: number = 1): Date {
+export function getPeriodEnd(period: Period, monthStartDay: number = 1): Date {
   const now = new Date();
   switch (period) {
     case 'daily':

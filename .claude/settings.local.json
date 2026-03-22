@@ -35,7 +35,8 @@
       "Bash(supabase projects:*)",
       "Bash(supabase db:*)",
       "Bash(export PATH=/opt/homebrew/bin:$PATH)",
-      "Bash(gh secret:*)"
+      "Bash(gh secret:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
