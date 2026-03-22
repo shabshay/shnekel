@@ -40,6 +40,41 @@ export function getPeriodEnd(period: Period, monthStartDay: number = 1): Date {
   }
 }
 
+export function shiftPeriodStart(start: Date, period: Period, offset: number, _monthStartDay: number = 1): Date {
+  if (offset === 0) return start;
+  const d = new Date(start);
+  switch (period) {
+    case 'daily':
+      d.setDate(d.getDate() + offset);
+      break;
+    case 'weekly':
+      d.setDate(d.getDate() + offset * 7);
+      break;
+    case 'monthly':
+      d.setMonth(d.getMonth() + offset);
+      break;
+  }
+  return d;
+}
+
+export function getPeriodLabel(period: Period, offset: number, monthStartDay: number = 1): string {
+  if (offset === 0) {
+    return period === 'daily' ? 'Today' : period === 'weekly' ? 'This week' : 'This month';
+  }
+  const start = shiftPeriodStart(getPeriodStart(period, monthStartDay), period, offset, monthStartDay);
+  if (offset === -1) {
+    return period === 'daily' ? 'Yesterday' : period === 'weekly' ? 'Last week' : 'Last month';
+  }
+  switch (period) {
+    case 'daily':
+      return start.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+    case 'weekly':
+      return `Week of ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })}`;
+    case 'monthly':
+      return start.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+  }
+}
+
 export function getTimeUntilReset(period: Period, monthStartDay: number = 1): string {
   const end = getPeriodEnd(period, monthStartDay);
   const now = new Date();
@@ -49,7 +84,10 @@ export function getTimeUntilReset(period: Period, monthStartDay: number = 1): st
   return `${hours}h ${minutes}m`;
 }
 
-export function useExpenses(period: Period, budgetAmount: number, monthStartDay: number = 1) {
+/**
+ * @param periodOffset - 0 = current period, -1 = previous period, -2 = two periods ago, etc.
+ */
+export function useExpenses(period: Period, budgetAmount: number, monthStartDay: number = 1, periodOffset: number = 0) {
   const [expenses, setExpenses] = useState<Expense[]>(getExpenses);
 
   // Re-read from localStorage when a sync pull completes
@@ -88,11 +126,23 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
     setExpenses(updated);
   }, []);
 
-  const periodStart = useMemo(() => getPeriodStart(period, monthStartDay), [period, monthStartDay]);
+  const periodStart = useMemo(() => {
+    const base = getPeriodStart(period, monthStartDay);
+    return periodOffset === 0 ? base : shiftPeriodStart(base, period, periodOffset, monthStartDay);
+  }, [period, monthStartDay, periodOffset]);
+
+  const periodEnd = useMemo(() => {
+    if (periodOffset === 0) return getPeriodEnd(period, monthStartDay);
+    // For past periods, end = start of next period
+    return shiftPeriodStart(periodStart, period, 1, monthStartDay);
+  }, [period, monthStartDay, periodOffset, periodStart]);
 
   const currentPeriodExpenses = useMemo(() => {
-    return expenses.filter(e => new Date(e.date) >= periodStart);
-  }, [expenses, periodStart]);
+    return expenses.filter(e => {
+      const d = new Date(e.date);
+      return d >= periodStart && d < periodEnd;
+    });
+  }, [expenses, periodStart, periodEnd]);
 
   const totalSpent = useMemo(() => {
     return currentPeriodExpenses.reduce((sum, e) => sum + e.amount, 0);

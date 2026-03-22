@@ -36,6 +36,12 @@ function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>
 function AuthenticatedApp() {
   const { settings, updateSettings, completeOnboarding } = useSettings();
 
+  // Apply dark mode
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', settings.darkMode ? '#0f1218' : '#f7f9fb');
+  }, [settings.darkMode]);
+
   // On mount: process recurring, migrate local data & pull remote data
   useEffect(() => {
     processRecurringExpenses();

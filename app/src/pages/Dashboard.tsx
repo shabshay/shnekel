@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Settings, Category, Expense } from '../types';
-import { useExpenses, getTimeUntilReset } from '../hooks/useExpenses';
+import { useExpenses, getTimeUntilReset, getPeriodLabel } from '../hooks/useExpenses';
 import { useAuth } from '../hooks/useAuth';
 import { BalanceGauge } from '../components/BalanceGauge';
 import { ExpenseList } from '../components/ExpenseList';
 import { AddExpenseModal } from '../components/AddExpenseModal';
 import { BudgetAlert } from '../components/BudgetAlert';
+import { getCategories } from '../lib/storage';
 import { CategoryBreakdown } from '../components/CategoryBreakdown';
 import { CoinLogo } from '../components/CoinLogo';
 
@@ -22,17 +23,36 @@ const periodLabels = {
 };
 
 export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
+  const [periodOffset, setPeriodOffset] = useState(0);
   const { currentPeriodExpenses, remaining, progress, addExpense, editExpense, removeExpense } = useExpenses(
     settings.period,
     settings.budgetAmount,
-    settings.monthStartDay
+    settings.monthStartDay,
+    periodOffset
   );
+  const isCurrentPeriod = periodOffset === 0;
   const { signOut, user } = useAuth();
   const [showAdd, setShowAdd] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [resetTime, setResetTime] = useState(getTimeUntilReset(settings.period, settings.monthStartDay));
   const [showSettings, setShowSettings] = useState(false);
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
+
+  const filteredExpenses = useMemo(() => {
+    if (!search.trim()) return currentPeriodExpenses;
+    const q = search.toLowerCase();
+    const categories = getCategories();
+    return currentPeriodExpenses.filter(e => {
+      const catLabel = categories.find(c => c.key === e.category)?.label ?? '';
+      return (
+        e.description.toLowerCase().includes(q) ||
+        catLabel.toLowerCase().includes(q) ||
+        String(e.amount).includes(q) ||
+        (e.notes && e.notes.toLowerCase().includes(q))
+      );
+    });
+  }, [currentPeriodExpenses, search]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -143,6 +163,19 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                 />
               </div>
 
+              {/* Dark mode toggle */}
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">Dark mode</label>
+                <button
+                  onClick={() => onUpdateSettings({ darkMode: !settings.darkMode })}
+                  className="text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+                >
+                  <span className="material-symbols-outlined text-2xl">
+                    {settings.darkMode ? 'toggle_on' : 'toggle_off'}
+                  </span>
+                </button>
+              </div>
+
               {/* Quick links */}
               <div className="space-y-1 pt-2 border-t border-outline-variant/20">
                 <button
@@ -179,16 +212,39 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         </div>
       )}
 
+      {/* Period navigation */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() => setPeriodOffset(o => o - 1)}
+          className="w-9 h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+        >
+          <span className="material-symbols-outlined text-lg">chevron_left</span>
+        </button>
+        <button
+          onClick={() => isCurrentPeriod ? null : setPeriodOffset(0)}
+          className={`font-headline font-semibold text-sm ${isCurrentPeriod ? 'text-on-primary-fixed' : 'text-on-tertiary-container cursor-pointer hover:underline'}`}
+        >
+          {getPeriodLabel(settings.period, periodOffset, settings.monthStartDay)}
+        </button>
+        <button
+          onClick={() => setPeriodOffset(o => Math.min(0, o + 1))}
+          disabled={isCurrentPeriod}
+          className="w-9 h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-surface-variant hover:text-on-primary-fixed transition-colors disabled:opacity-30"
+        >
+          <span className="material-symbols-outlined text-lg">chevron_right</span>
+        </button>
+      </div>
+
       {/* Budget Alert */}
-      <BudgetAlert progress={progress} remaining={remaining} threshold={settings.alertThreshold ?? 80} />
+      {isCurrentPeriod && <BudgetAlert progress={progress} remaining={remaining} threshold={settings.alertThreshold ?? 80} />}
 
       {/* Gauge */}
       <div className="mb-8">
         <BalanceGauge
           remaining={remaining}
           progress={progress}
-          periodLabel={periodLabels[settings.period]}
-          resetTime={resetTime}
+          periodLabel={isCurrentPeriod ? periodLabels[settings.period] : 'spent'}
+          resetTime={isCurrentPeriod ? resetTime : ''}
         />
       </div>
 
@@ -222,10 +278,32 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         </button>
       </div>
 
-      {/* Recent expenses */}
+      {/* Search */}
+      <div className="relative mb-4">
+        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search expenses..."
+          className="w-full bg-surface-container-lowest rounded-xl pl-10 pr-4 py-3 font-body text-sm text-on-surface border-none outline-none placeholder:text-outline-variant"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-primary-fixed"
+          >
+            <span className="material-symbols-outlined text-lg">close</span>
+          </button>
+        )}
+      </div>
+
+      {/* Expense list */}
       <div>
-        <h3 className="font-headline font-bold text-lg text-on-primary-fixed mb-4">Recent expenses</h3>
-        <ExpenseList expenses={currentPeriodExpenses} onDelete={removeExpense} onEdit={handleEdit} />
+        <h3 className="font-headline font-bold text-lg text-on-primary-fixed mb-4">
+          {search ? 'Search results' : 'Recent expenses'}
+        </h3>
+        <ExpenseList expenses={filteredExpenses} onDelete={removeExpense} onEdit={handleEdit} />
       </div>
 
       {/* Add modal */}

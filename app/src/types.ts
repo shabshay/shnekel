@@ -16,6 +16,7 @@ export interface Settings {
   budgetAmount: number;
   monthStartDay: number; // 1-28, which day of the month the budget resets
   alertThreshold: number; // 0-100, percentage to trigger budget warning (default 80)
+  darkMode: boolean;
   onboardingComplete: boolean;
   customCategories?: CategoryInfo[];
 }

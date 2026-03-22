@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS: Settings = {
   budgetAmount: 200,
   monthStartDay: 1,
   alertThreshold: 80,
+  darkMode: false,
   onboardingComplete: false,
 };
 

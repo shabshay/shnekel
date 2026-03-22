@@ -1,0 +1,19 @@
+{
+  "name": "Shnekel",
+  "short_name": "Shnekel",
+  "description": "Spend like it's cash. Track your expenses with the 2₪ coin.",
+  "start_url": "/shnekel/",
+  "scope": "/shnekel/",
+  "display": "standalone",
+  "background_color": "#f7f9fb",
+  "theme_color": "#131b2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
