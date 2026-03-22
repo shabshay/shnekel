@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#1a2634",
+              "surface-tint": "#535f6f",
+              "on-tertiary-fixed": "#22005d",
+              "on-surface": "#191c1d",
+              "on-tertiary-fixed-variant": "#5300cd",
+              "on-primary-fixed": "#101c2a",
+              "tertiary": "#150040",
+              "surface-bright": "#f8f9fa",
+              "inverse-surface": "#2e3132",
+              "secondary-fixed": "#69ff87",
+              "outline": "#75777c",
+              "error": "#ba1a1a",
+              "surface-dim": "#d9dadb",
+              "surface-variant": "#e1e3e4",
+              "primary": "#05111e",
+              "secondary-container": "#5cfd80",
+              "on-secondary-fixed": "#002108",
+              "tertiary-fixed-dim": "#cfbdff",
+              "secondary-fixed-dim": "#3ce36a",
+              "on-error": "#ffffff",
+              "surface-container": "#edeeef",
+              "primary-fixed-dim": "#bbc7da",
+              "surface-container-low": "#f3f4f5",
+              "on-surface-variant": "#44474c",
+              "on-tertiary-container": "#9973ff",
+              "surface": "#f8f9fa",
+              "surface-container-highest": "#e1e3e4",
+              "inverse-primary": "#bbc7da",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#3c4857",
+              "surface-container-high": "#e7e8e9",
+              "tertiary-fixed": "#e8ddff",
+              "background": "#f8f9fa",
+              "secondary": "#006e2a",
+              "tertiary-container": "#2d0076",
+              "on-error-container": "#93000a",
+              "on-secondary-fixed-variant": "#00531e",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#191c1d",
+              "on-primary-container": "#818d9f",
+              "primary-fixed": "#d7e3f7",
+              "inverse-on-surface": "#f0f1f2",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-primary": "#ffffff",
+              "outline-variant": "#c4c6cc",
+              "on-secondary-container": "#00732c"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #F8F9FA;
+        font-family: 'Inter', sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .custom-shadow {
+        box-shadow: 0px 20px 40px rgba(26, 38, 52, 0.06);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Suppressing Shared Components (BottomNavBar, SideNav) as per the "Destination" Rule for Transactional/Onboarding pages -->
+<main class="min-h-screen flex flex-col max-w-xl mx-auto px-6 py-12">
+<!-- Header / Logo Section -->
+<header class="flex flex-col items-center mb-16">
+<div class="mb-4">
+<span class="text-primary-container font-headline font-extrabold text-4xl tracking-tighter">Shnekel</span>
+</div>
+<p class="text-on-surface-variant font-body text-sm tracking-wide">להרגיש את המזומן בכיס</p>
+</header>
+<!-- Onboarding Progress (Subtle) -->
+<div class="w-full flex justify-center gap-2 mb-10">
+<div class="h-1 w-12 rounded-full bg-primary-container"></div>
+<div class="h-1 w-12 rounded-full bg-surface-container-highest"></div>
+<div class="h-1 w-12 rounded-full bg-surface-container-highest"></div>
+</div>
+<!-- Headline -->
+<section class="mb-10 text-center">
+<h1 class="font-headline font-bold text-3xl text-primary-container mb-2">בחר את התקופה שלך</h1>
+<p class="text-on-surface-variant font-body">באיזו תדירות תרצה לנהל את המעקב?</p>
+</section>
+<!-- Selection Options (Bento-lite Layout) -->
+<section class="grid grid-cols-1 gap-4 mb-12">
+<!-- Option: Daily (Inactive) -->
+<button class="group flex items-center justify-between p-6 bg-surface-container-lowest rounded-xl border-none transition-all duration-200 active:scale-[0.98] hover:bg-surface-container-low text-right">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="calendar_view_day">calendar_view_day</span>
+</div>
+<div>
+<span class="block font-headline font-bold text-xl text-primary-container">יומי</span>
+<span class="block font-body text-sm text-on-surface-variant">מתאים למעקב הדוק בכל יום</span>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-transparent"></div>
+</div>
+</button>
+<!-- Option: Weekly (Inactive) -->
+<button class="group flex items-center justify-between p-6 bg-surface-container-lowest rounded-xl border-none transition-all duration-200 active:scale-[0.98] hover:bg-surface-container-low text-right">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="calendar_view_week">calendar_view_week</span>
+</div>
+<div>
+<span class="block font-headline font-bold text-xl text-primary-container">שבועי</span>
+<span class="block font-body text-sm text-on-surface-variant">ניהול תקציב לפי שבועות</span>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-transparent"></div>
+</div>
+</button>
+<!-- Option: Monthly (Selected/Active) -->
+<button class="group flex items-center justify-between p-6 bg-primary-container rounded-xl border-none custom-shadow transition-all duration-200 active:scale-[0.98] text-right">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="calendar_month" data-weight="fill" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+</div>
+<div>
+<span class="block font-headline font-bold text-xl text-white">חודשי</span>
+<span class="block font-body text-sm text-white/70">הבחירה הפופולרית ביותר</span>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-white"></div>
+</div>
+</button>
+</section>
+<!-- Informational Snippet -->
+<div class="mt-auto bg-surface-container-low p-5 rounded-xl flex items-start gap-4 mb-8">
+<span class="material-symbols-outlined text-secondary" data-icon="info">info</span>
+<p class="font-body text-xs text-on-surface-variant leading-relaxed">
+                ניתן לשנות את תקופת התקציב בכל עת מתוך הגדרות הפרופיל שלך לאחר סיום ההרשמה.
+            </p>
+</div>
+<!-- Footer / Primary CTA -->
+<footer class="mt-auto pb-6">
+<button class="w-full py-5 bg-primary-container text-white font-headline font-bold text-lg rounded-xl flex items-center justify-center gap-2 custom-shadow hover:opacity-90 active:scale-95 transition-all">
+<span>המשך</span>
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+</footer>
+</main>
+<!-- Visual Backdrop Element -->
+<div class="fixed top-0 right-0 -z-10 opacity-5 w-64 h-64 overflow-hidden pointer-events-none">
+<div class="absolute -top-10 -right-10 text-[20rem] font-headline font-extrabold text-primary-container">₪</div>
+</div>
+</body></html>

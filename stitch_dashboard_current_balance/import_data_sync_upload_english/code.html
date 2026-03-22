@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Import Your Data - Shnekel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#3f465c",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#bec6e0",
+              "surface-container-highest": "#e0e3e5",
+              "surface": "#f7f9fb",
+              "on-tertiary-container": "#009668",
+              "on-surface-variant": "#45464d",
+              "surface-container-low": "#f2f4f6",
+              "primary-fixed-dim": "#bec6e0",
+              "surface-container": "#eceef0",
+              "on-error": "#ffffff",
+              "on-secondary-container": "#586377",
+              "outline-variant": "#c6c6cd",
+              "on-primary": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "inverse-on-surface": "#eff1f3",
+              "primary-fixed": "#dae2fd",
+              "on-primary-container": "#7c839b",
+              "on-background": "#191c1e",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed-variant": "#3c475a",
+              "on-error-container": "#93000a",
+              "tertiary-container": "#002113",
+              "secondary": "#545f73",
+              "tertiary-fixed": "#6ffbbe",
+              "background": "#f7f9fb",
+              "surface-container-high": "#e6e8ea",
+              "error": "#ba1a1a",
+              "outline": "#76777d",
+              "secondary-fixed": "#d8e3fb",
+              "inverse-surface": "#2d3133",
+              "surface-bright": "#f7f9fb",
+              "tertiary": "#000000",
+              "on-primary-fixed": "#131b2e",
+              "on-tertiary-fixed-variant": "#005236",
+              "on-surface": "#191c1e",
+              "surface-tint": "#565e74",
+              "on-tertiary-fixed": "#002113",
+              "primary-container": "#131b2e",
+              "secondary-fixed-dim": "#bcc7de",
+              "tertiary-fixed-dim": "#4edea3",
+              "on-secondary-fixed": "#111c2d",
+              "secondary-container": "#d5e0f8",
+              "primary": "#000000",
+              "surface-variant": "#e0e3e5",
+              "surface-dim": "#d8dadc"
+            },
+            fontFamily: {
+              "headline": ["Lexend"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f2f4f6;
+        }
+        .bento-card {
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .bento-card:hover {
+            background-color: #ffffff;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-low text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#131B2E]/80 backdrop-blur-3xl">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User professional profile avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoFCFd3SWKSOJgQX8keknvQP1egzyiRk8ppYmA7vCotoAutcGBa43V_shXW-OG7GBfxNVSrqbpHT5W6kYEmIvSHfaNVt9K-lNKOf59duT_0a2sHOvkladhvcrvHZkuzyDMioxvCSNbv6FnoYC8khIAR2YXzr8iFG4gwcBY3NiM3hQ6wZmGeSJbO-bkJuRNhl0q0ZMvucnFAbHbzEm36-pf5Smq4aHOEcSGHLAq-ZzaF0Mg7t7M-sQd1qSgEEs1BSvGt27feca9usA"/>
+</div>
+<span class="font-['Lexend'] font-black text-[#131B2E] dark:text-white text-2xl tracking-tight">Shnekel</span>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="font-['Lexend'] font-medium text-sm text-slate-400 hover:opacity-70 transition-opacity" href="#">Home</a>
+<a class="font-['Lexend'] font-medium text-sm text-slate-400 hover:opacity-70 transition-opacity" href="#">Add</a>
+<a class="font-['Lexend'] font-medium text-sm text-[#131B2E] dark:text-white border-b-2 border-[#009668] pb-1" href="#">Import</a>
+<a class="font-['Lexend'] font-medium text-sm text-slate-400 hover:opacity-70 transition-opacity" href="#">Reports</a>
+</div>
+<button class="material-symbols-outlined text-[#131B2E] dark:text-white active:scale-95 transition-transform">notifications</button>
+</div>
+</header>
+<main class="pt-32 pb-32 px-6 max-w-7xl mx-auto">
+<!-- Title Section -->
+<div class="mb-12">
+<h1 class="font-headline font-bold text-4xl text-on-primary-fixed tracking-tight mb-2">Import Your Data</h1>
+<p class="font-body text-on-surface-variant text-lg">Securely connect your financial institutions or upload local files.</p>
+</div>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: File Upload (Bento Style) -->
+<div class="lg:col-span-7 space-y-8">
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-on-primary-container">upload_file</span>
+<h2 class="font-headline font-semibold text-xl">Upload Bank File</h2>
+</div>
+<!-- Drag and Drop Zone -->
+<div class="relative group cursor-pointer border-2 border-dashed border-outline-variant/30 rounded-xl p-12 flex flex-col items-center justify-center bg-surface hover:bg-white transition-all duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-primary-fixed text-3xl">cloud_upload</span>
+</div>
+<p class="font-headline font-medium text-lg text-on-surface mb-2">Drag and drop your statement</p>
+<p class="font-body text-on-surface-variant text-sm text-center max-w-xs">Supported formats: <span class="font-semibold">CSV, Excel (.xlsx), and PDF</span></p>
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+</div>
+<div class="mt-8 flex items-center justify-between p-4 bg-surface rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">security</span>
+<span class="font-body text-sm text-on-surface-variant">Encrypted file processing</span>
+</div>
+<button class="px-6 py-2 bg-primary-container text-on-primary font-headline font-medium rounded-lg active:scale-95 transition-transform">Browse Files</button>
+</div>
+</section>
+<!-- Security Assurance -->
+<div class="grid grid-cols-2 gap-4">
+<div class="p-6 bg-tertiary-container/5 rounded-xl border border-tertiary-container/10">
+<span class="material-symbols-outlined text-on-tertiary-container mb-3">lock</span>
+<h3 class="font-headline font-semibold text-sm mb-1">AES-256 Encryption</h3>
+<p class="font-body text-xs text-on-surface-variant">Your sensitive data is encrypted before it ever leaves your browser.</p>
+</div>
+<div class="p-6 bg-secondary-container/20 rounded-xl border border-secondary-container/30">
+<span class="material-symbols-outlined text-on-secondary-container mb-3">verified_user</span>
+<h3 class="font-headline font-semibold text-sm mb-1">GDPR Compliant</h3>
+<p class="font-body text-xs text-on-surface-variant">We adhere to the highest international standards of data privacy.</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Sync Institutions -->
+<div class="lg:col-span-5">
+<section class="bg-primary-container text-on-primary p-8 rounded-xl h-full flex flex-col">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary-fixed">sync_alt</span>
+<h2 class="font-headline font-semibold text-xl">Sync Credit Card</h2>
+</div>
+<p class="font-body text-on-primary-container text-sm mb-8">Connect your bank account or credit card for real-time transaction monitoring and automated reporting.</p>
+<div class="space-y-4 mb-8">
+<button class="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/15 rounded-xl transition-colors text-left group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div>
+<p class="font-headline font-semibold text-sm">Direct Connection</p>
+<p class="text-[10px] text-on-primary-container uppercase tracking-widest font-bold">Fastest Sync</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-primary-container group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/15 rounded-xl transition-colors text-left group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<div>
+<p class="font-headline font-semibold text-sm">Plaid Secure Bridge</p>
+<p class="text-[10px] text-on-primary-container uppercase tracking-widest font-bold">Safe &amp; Reliable</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-primary-container group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+<div class="mt-auto pt-8 border-t border-white/10">
+<div class="flex items-center gap-2 text-xs text-on-primary-container">
+<span class="material-symbols-outlined text-sm">info</span>
+<span>Direct connections are available for 15,000+ institutions.</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Supported Institutions List -->
+<section class="mt-16">
+<h2 class="font-headline font-semibold text-lg text-on-primary-fixed mb-8">Supported Institutions</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+<!-- Institution Placeholders -->
+<div class="bg-surface-container p-6 rounded-xl flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default group">
+<span class="font-headline font-bold text-slate-400 group-hover:text-primary-container">CHASE</span>
+</div>
+<div class="bg-surface-container p-6 rounded-xl flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default group">
+<span class="font-headline font-bold text-slate-400 group-hover:text-primary-container">CITI</span>
+</div>
+<div class="bg-surface-container p-6 rounded-xl flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default group">
+<span class="font-headline font-bold text-slate-400 group-hover:text-primary-container">AMEX</span>
+</div>
+<div class="bg-surface-container p-6 rounded-xl flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default group">
+<span class="font-headline font-bold text-slate-400 group-hover:text-primary-container">BARCLAYS</span>
+</div>
+<div class="bg-surface-container p-6 rounded-xl flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default group">
+<span class="font-headline font-bold text-slate-400 group-hover:text-primary-container">WELLS</span>
+</div>
+<div class="bg-surface-container p-6 rounded-xl flex items-center justify-center grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all cursor-default group">
+<span class="font-headline font-bold text-slate-400 group-hover:text-primary-container">REVOLUT</span>
+</div>
+</div>
+<div class="mt-8 text-center">
+<button class="font-body text-sm font-semibold text-[#009668] hover:underline">View all 15,000+ supported banks</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-white/80 dark:bg-[#131B2E]/80 backdrop-blur-3xl border-t border-slate-100/10 shadow-[0_-20px_40px_rgba(19,27,46,0.04)] flex justify-around items-center px-4 pb-8 pt-4 rounded-t-3xl">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#009668] transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-wide uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#009668] transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">add_circle</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-wide uppercase">Add</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#009668] dark:text-[#6FFBBE] font-bold active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">account_balance_wallet</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-wide uppercase">Import</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#009668] transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">monitoring</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-wide uppercase">Reports</span>
+</a>
+</nav>
+</body></html>
