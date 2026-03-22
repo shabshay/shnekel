@@ -72,107 +72,108 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         </button>
       </div>
 
-      {/* Settings panel */}
+      {/* Settings overlay */}
       {showSettings && (
-        <div className="bg-surface-container-lowest rounded-xl p-6 mb-6 space-y-4">
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">
-              Period
-            </label>
-            <div className="flex gap-2">
-              {(['daily', 'weekly', 'monthly'] as const).map(p => (
-                <button
-                  key={p}
-                  onClick={() => onUpdateSettings({ period: p })}
-                  className={`flex-1 py-2 rounded-lg font-headline text-sm font-semibold transition-all ${
-                    settings.period === p
-                      ? 'bg-primary-container text-white'
-                      : 'bg-surface text-on-surface-variant hover:bg-surface-container'
-                  }`}
-                >
-                  {p.charAt(0).toUpperCase() + p.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">
-              Budget (₪)
-            </label>
-            <input
-              type="number"
-              value={settings.budgetAmount}
-              onChange={e => {
-                const v = parseFloat(e.target.value);
-                if (v > 0) onUpdateSettings({ budgetAmount: v });
-              }}
-              className="w-full bg-surface rounded-lg px-4 py-2 font-headline font-bold text-on-primary-fixed border-none outline-none"
-            />
-          </div>
-          {settings.period === 'monthly' && (
-            <div>
-              <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">
-                Month starts on day
-              </label>
-              <select
-                value={settings.monthStartDay}
-                onChange={e => onUpdateSettings({ monthStartDay: parseInt(e.target.value) })}
-                className="w-full bg-surface rounded-lg px-4 py-2 font-headline font-bold text-on-primary-fixed border-none outline-none"
-              >
-                {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
-                  <option key={day} value={day}>{day}</option>
-                ))}
-              </select>
-            </div>
-          )}
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowSettings(false)} />
+          <div className="relative bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-8 pb-10 z-10 max-h-[85vh] overflow-y-auto animate-slide-up">
+            <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
+            <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">Settings</h2>
 
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">
-              Alert at (%)
-            </label>
-            <input
-              type="number"
-              min="50"
-              max="100"
-              value={settings.alertThreshold ?? 80}
-              onChange={e => {
-                const v = parseInt(e.target.value);
-                if (v >= 50 && v <= 100) onUpdateSettings({ alertThreshold: v });
-              }}
-              className="w-full bg-surface rounded-lg px-4 py-2 font-headline font-bold text-on-primary-fixed border-none outline-none"
-            />
-          </div>
-          {/* Quick links */}
-          <div className="space-y-1">
-            <button
-              onClick={() => { setShowSettings(false); navigate('/categories'); }}
-              className="w-full flex items-center gap-3 py-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
-            >
-              <span className="material-symbols-outlined text-lg">category</span>
-              <span className="font-semibold text-sm">Manage categories</span>
-            </button>
-            <button
-              onClick={() => { setShowSettings(false); navigate('/import'); }}
-              className="w-full flex items-center gap-3 py-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
-            >
-              <span className="material-symbols-outlined text-lg">upload_file</span>
-              <span className="font-semibold text-sm">Import expenses from file</span>
-            </button>
-          </div>
-
-          {/* Sign out */}
-          <div className="pt-2 border-t border-outline-variant/20">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0">
-                <p className="text-on-surface-variant text-xs truncate">{user?.email}</p>
+            <div className="space-y-5">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Period</label>
+                <div className="flex gap-2">
+                  {(['daily', 'weekly', 'monthly'] as const).map(p => (
+                    <button
+                      key={p}
+                      onClick={() => onUpdateSettings({ period: p })}
+                      className={`flex-1 py-2.5 rounded-lg font-headline text-sm font-semibold transition-all ${
+                        settings.period === p
+                          ? 'bg-primary-container text-white'
+                          : 'bg-surface text-on-surface-variant hover:bg-surface-container'
+                      }`}
+                    >
+                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <button
-                onClick={signOut}
-                className="flex items-center gap-1.5 py-2 px-3 rounded-lg text-error text-sm font-semibold hover:bg-error/5 transition-colors"
-              >
-                <span className="material-symbols-outlined text-lg">logout</span>
-                Sign out
-              </button>
+
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Budget (₪)</label>
+                <input
+                  type="number"
+                  value={settings.budgetAmount}
+                  onChange={e => {
+                    const v = parseFloat(e.target.value);
+                    if (v > 0) onUpdateSettings({ budgetAmount: v });
+                  }}
+                  className="w-full bg-surface rounded-xl px-4 py-3 font-headline font-bold text-on-primary-fixed border-none outline-none"
+                />
+              </div>
+
+              {settings.period === 'monthly' && (
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Month starts on day</label>
+                  <select
+                    value={settings.monthStartDay}
+                    onChange={e => onUpdateSettings({ monthStartDay: parseInt(e.target.value) })}
+                    className="w-full bg-surface rounded-xl px-4 py-3 font-headline font-bold text-on-primary-fixed border-none outline-none"
+                  >
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Alert at (%)</label>
+                <input
+                  type="number"
+                  min="50"
+                  max="100"
+                  value={settings.alertThreshold ?? 80}
+                  onChange={e => {
+                    const v = parseInt(e.target.value);
+                    if (v >= 50 && v <= 100) onUpdateSettings({ alertThreshold: v });
+                  }}
+                  className="w-full bg-surface rounded-xl px-4 py-3 font-headline font-bold text-on-primary-fixed border-none outline-none"
+                />
+              </div>
+
+              {/* Quick links */}
+              <div className="space-y-1 pt-2 border-t border-outline-variant/20">
+                <button
+                  onClick={() => { setShowSettings(false); navigate('/categories'); }}
+                  className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">category</span>
+                  <span className="font-semibold text-sm">Manage categories</span>
+                </button>
+                <button
+                  onClick={() => { setShowSettings(false); navigate('/import'); }}
+                  className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">upload_file</span>
+                  <span className="font-semibold text-sm">Import expenses from file</span>
+                </button>
+              </div>
+
+              {/* Sign out */}
+              <div className="pt-2 border-t border-outline-variant/20">
+                <div className="flex items-center justify-between">
+                  <p className="text-on-surface-variant text-xs truncate">{user?.email}</p>
+                  <button
+                    onClick={signOut}
+                    className="flex items-center gap-1.5 py-2 px-3 rounded-lg text-error text-sm font-semibold hover:bg-error/5 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-lg">logout</span>
+                    Sign out
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
