@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Expense, Category, Period } from '../types';
-import { getExpenses, addExpense as addExpenseToStorage, addExpensesBatch as addExpensesBatchToStorage, deleteExpense as deleteExpenseFromStorage } from '../lib/storage';
+import { getExpenses, addExpense as addExpenseToStorage, addExpensesBatch as addExpensesBatchToStorage, updateExpense as updateExpenseInStorage, deleteExpense as deleteExpenseFromStorage } from '../lib/storage';
 
 function getPeriodStart(period: Period, monthStartDay: number = 1): Date {
   const now = new Date();
@@ -76,6 +76,11 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
     setExpenses(updated);
   }, []);
 
+  const editExpense = useCallback((expense: Expense) => {
+    const updated = updateExpenseInStorage(expense);
+    setExpenses(updated);
+  }, []);
+
   const removeExpense = useCallback((id: string) => {
     const updated = deleteExpenseFromStorage(id);
     setExpenses(updated);
@@ -102,6 +107,7 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
     progress,
     addExpense,
     addExpensesBatch,
+    editExpense,
     removeExpense,
   };
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Settings, Category } from '../types';
+import type { Settings, Category, Expense } from '../types';
 import { useExpenses, getTimeUntilReset } from '../hooks/useExpenses';
+import { useAuth } from '../hooks/useAuth';
 import { BalanceGauge } from '../components/BalanceGauge';
 import { ExpenseList } from '../components/ExpenseList';
 import { AddExpenseModal } from '../components/AddExpenseModal';
@@ -18,12 +19,14 @@ const periodLabels = {
 };
 
 export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
-  const { currentPeriodExpenses, remaining, progress, addExpense, removeExpense } = useExpenses(
+  const { currentPeriodExpenses, remaining, progress, addExpense, editExpense, removeExpense } = useExpenses(
     settings.period,
     settings.budgetAmount,
     settings.monthStartDay
   );
+  const { signOut, user } = useAuth();
   const [showAdd, setShowAdd] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [resetTime, setResetTime] = useState(getTimeUntilReset(settings.period, settings.monthStartDay));
   const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
@@ -37,6 +40,14 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
   const handleAdd = (amount: number, category: Category, description: string) => {
     addExpense(amount, category, description);
+  };
+
+  const handleEdit = (expense: Expense) => {
+    setEditingExpense(expense);
+  };
+
+  const handleUpdate = (expense: Expense) => {
+    editExpense(expense);
   };
 
   return (
@@ -108,6 +119,31 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
               </select>
             </div>
           )}
+
+          {/* Import link */}
+          <button
+            onClick={() => { setShowSettings(false); navigate('/import'); }}
+            className="w-full flex items-center gap-3 py-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">upload_file</span>
+            <span className="font-semibold text-sm">Import expenses from file</span>
+          </button>
+
+          {/* Sign out */}
+          <div className="pt-2 border-t border-outline-variant/20">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-on-surface-variant text-xs truncate">{user?.email}</p>
+              </div>
+              <button
+                onClick={signOut}
+                className="flex items-center gap-1.5 py-2 px-3 rounded-lg text-error text-sm font-semibold hover:bg-error/5 transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">logout</span>
+                Sign out
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -146,10 +182,20 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       {/* Recent expenses */}
       <div>
         <h3 className="font-headline font-bold text-lg text-on-primary-fixed mb-4">Recent expenses</h3>
-        <ExpenseList expenses={currentPeriodExpenses} onDelete={removeExpense} />
+        <ExpenseList expenses={currentPeriodExpenses} onDelete={removeExpense} onEdit={handleEdit} />
       </div>
 
+      {/* Add modal */}
       <AddExpenseModal open={showAdd} onClose={() => setShowAdd(false)} onAdd={handleAdd} />
+
+      {/* Edit modal */}
+      <AddExpenseModal
+        open={!!editingExpense}
+        onClose={() => setEditingExpense(null)}
+        onAdd={handleAdd}
+        onUpdate={handleUpdate}
+        editExpense={editingExpense}
+      />
     </div>
   );
 }

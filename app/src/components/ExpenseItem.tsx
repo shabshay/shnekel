@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import type { Expense } from '../types';
 import { CategoryIcon } from './CategoryIcon';
 import { CATEGORIES } from '../types';
+import { formatCurrency } from '../lib/format';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface ExpenseItemProps {
   expense: Expense;
   onDelete?: (id: string) => void;
+  onEdit?: (expense: Expense) => void;
 }
 
 function formatTime(dateStr: string): string {
@@ -20,31 +24,50 @@ function formatTime(dateStr: string): string {
   return d.toLocaleDateString('en', { month: 'short', day: 'numeric' }) + `, ${time}`;
 }
 
-export function ExpenseItem({ expense, onDelete }: ExpenseItemProps) {
+export function ExpenseItem({ expense, onDelete, onEdit }: ExpenseItemProps) {
   const cat = CATEGORIES.find(c => c.key === expense.category);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
-    <div className="flex items-center justify-between group">
-      <div className="flex items-center gap-4">
-        <CategoryIcon category={expense.category} />
-        <div>
-          <p className="font-headline font-bold text-on-primary-fixed text-sm">{expense.description}</p>
-          <p className="font-body text-xs text-on-surface-variant">
-            {cat?.label} &middot; {formatTime(expense.date)}
-          </p>
+    <>
+      <div className="flex items-center justify-between group">
+        <div
+          className={`flex items-center gap-4 flex-grow min-w-0 ${onEdit ? 'cursor-pointer' : ''}`}
+          onClick={() => onEdit?.(expense)}
+        >
+          <CategoryIcon category={expense.category} />
+          <div className="min-w-0">
+            <p className="font-headline font-bold text-on-primary-fixed text-sm truncate">{expense.description}</p>
+            <p className="font-body text-xs text-on-surface-variant">
+              {cat?.label} &middot; {formatTime(expense.date)}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <p className="font-headline font-bold text-on-primary-fixed">{formatCurrency(expense.amount, true)}</p>
+          {onDelete && (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity text-on-surface-variant hover:text-error"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          )}
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <p className="font-headline font-bold text-on-primary-fixed">₪{expense.amount.toFixed(2)}</p>
-        {onDelete && (
-          <button
-            onClick={() => onDelete(expense.id)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity text-on-surface-variant hover:text-error"
-          >
-            <span className="material-symbols-outlined text-lg">close</span>
-          </button>
-        )}
-      </div>
-    </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete expense?"
+        message={`Remove "${expense.description}" (${formatCurrency(expense.amount, true)})? This can't be undone.`}
+        confirmLabel="Delete"
+        confirmDestructive
+        onConfirm={() => {
+          setConfirmDelete(false);
+          onDelete?.(expense.id);
+        }}
+        onCancel={() => setConfirmDelete(false)}
+      />
+    </>
   );
 }

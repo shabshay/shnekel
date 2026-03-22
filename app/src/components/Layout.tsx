@@ -3,8 +3,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 const navItems = [
   { to: '/', icon: 'home', label: 'Home' },
   { to: '/add', icon: 'add_circle', label: 'Add' },
+  { to: '/recurring', icon: 'repeat', label: 'Recurring' },
   { to: '/reports', icon: 'monitoring', label: 'Reports' },
-  { to: '/import', icon: 'upload_file', label: 'Import' },
 ];
 
 export function Layout() {

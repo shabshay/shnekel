@@ -17,6 +17,21 @@ export interface Expense {
   date: string; // ISO string
 }
 
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly';
+
+export interface RecurringExpense {
+  id: string;
+  amount: number;
+  category: Category;
+  description: string;
+  frequency: RecurringFrequency;
+  dayOfMonth?: number;    // 1-28, for monthly
+  dayOfWeek?: number;     // 0=Sun, 1=Mon, ... for weekly
+  lastGenerated?: string; // ISO date string of last auto-generated expense
+  active: boolean;
+  createdAt: string;      // ISO string
+}
+
 export const CATEGORIES: { key: Category; label: string; icon: string; color: string }[] = [
   { key: 'food', label: 'Food', icon: 'restaurant', color: '#FF6B35' },
   { key: 'transport', label: 'Transport', icon: 'directions_car', color: '#4E7CFF' },

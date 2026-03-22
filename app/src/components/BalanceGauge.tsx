@@ -1,3 +1,5 @@
+import { formatCurrency } from '../lib/format';
+
 interface BalanceGaugeProps {
   remaining: number;
   progress: number;
@@ -49,15 +51,9 @@ export function BalanceGauge({ remaining, progress, periodLabel, resetTime }: Ba
         </svg>
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="flex items-baseline">
-            {isOverBudget && (
-              <span className="font-headline text-error font-bold text-3xl mr-0.5">-</span>
-            )}
-            <span className={`font-headline font-bold text-3xl mr-0.5 ${isOverBudget ? 'text-error' : 'text-on-primary-fixed'}`}>₪</span>
-            <span className={`font-headline font-extrabold text-6xl tracking-tight ${isOverBudget ? 'text-error' : 'text-on-primary-fixed'}`}>
-              {Math.abs(Math.round(remaining))}
-            </span>
-          </div>
+          <span className={`font-headline font-extrabold text-5xl tracking-tight ${isOverBudget ? 'text-error' : 'text-on-primary-fixed'}`}>
+            {formatCurrency(remaining)}
+          </span>
           <span className={`font-headline font-semibold text-base mt-1 ${isOverBudget ? 'text-error' : 'text-on-tertiary-container'}`}>
             {isOverBudget ? 'over budget' : periodLabel}
           </span>

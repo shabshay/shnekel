@@ -7,10 +7,12 @@ import { Onboarding } from './pages/Onboarding';
 import { Dashboard } from './pages/Dashboard';
 import { Reports } from './pages/Reports';
 import { Import } from './pages/Import';
+import { Recurring } from './pages/Recurring';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { useState, useEffect } from 'react';
 import { useExpenses } from './hooks/useExpenses';
 import { pullFromSupabase, migrateLocalToSupabase } from './lib/sync';
+import { processRecurringExpenses } from './lib/storage';
 import type { Category } from './types';
 
 function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>['settings'] }) {
@@ -32,8 +34,9 @@ function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>
 function AuthenticatedApp() {
   const { settings, updateSettings, completeOnboarding } = useSettings();
 
-  // On mount: migrate local data & pull remote data
+  // On mount: process recurring, migrate local data & pull remote data
   useEffect(() => {
+    processRecurringExpenses();
     migrateLocalToSupabase().then(() => pullFromSupabase());
 
     // Periodic pull every 5 minutes
@@ -56,6 +59,7 @@ function AuthenticatedApp() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/add" element={<AddExpensePage settings={settings} />} />
           <Route path="/import" element={<Import />} />
+          <Route path="/recurring" element={<Recurring />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

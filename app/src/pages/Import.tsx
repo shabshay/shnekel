@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { parseImportFile, downloadTemplate, type ImportedRow, type DetectedFormat } from '../lib/importParser';
 import { addExpensesBatch } from '../lib/storage';
 import { CATEGORIES, type Category, type Expense } from '../types';
+import { formatCurrency } from '../lib/format';
 
 type Step = 'upload' | 'preview' | 'done';
 
@@ -231,7 +232,7 @@ export function Import() {
             </div>
             <div className="text-right">
               <p className="text-on-surface-variant text-xs">Total</p>
-              <p className="font-headline font-bold text-on-primary-fixed">₪{totalSelected.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="font-headline font-bold text-on-primary-fixed">{formatCurrency(totalSelected)}</p>
             </div>
           </div>
 
@@ -296,7 +297,7 @@ export function Import() {
 
                   {/* Amount */}
                   <span className="font-headline font-bold text-on-primary-fixed text-sm flex-shrink-0 w-16 text-right">
-                    ₪{row.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    {formatCurrency(row.amount)}
                   </span>
                 </div>
               );

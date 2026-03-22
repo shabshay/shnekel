@@ -5,6 +5,7 @@ import { getExpenses, getSettings } from '../lib/storage';
 import { getExpenseStats } from '../hooks/useExpenses';
 import { StatsCard } from '../components/StatsCard';
 import { CATEGORIES } from '../types';
+import { formatCurrency } from '../lib/format';
 
 type FilterPeriod = 'today' | 'week' | 'month';
 
@@ -57,9 +58,9 @@ export function Reports() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3 mb-8">
-        <StatsCard label="Total spent" value={`₪${Math.round(stats.totalSpent)}`} color="#E040FB" />
-        <StatsCard label="Average per day" value={`₪${Math.round(stats.avgPerDay)}`} color="#4E7CFF" />
-        <StatsCard label="Highest day" value={`₪${Math.round(stats.highestDay)}`} color="#FF6B35" />
+        <StatsCard label="Total spent" value={formatCurrency(stats.totalSpent)} color="#E040FB" />
+        <StatsCard label="Average per day" value={formatCurrency(stats.avgPerDay)} color="#4E7CFF" />
+        <StatsCard label="Highest day" value={formatCurrency(stats.highestDay)} color="#FF6B35" />
         <StatsCard label="Top category" value={topCatLabel} color={topCatColor} />
       </div>
 
@@ -86,10 +87,10 @@ export function Reports() {
                 tick={{ fontSize: 10, fill: '#45464d' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={v => `₪${v}`}
+                tickFormatter={v => formatCurrency(Number(v))}
               />
               <Tooltip
-                formatter={(value: unknown) => [`₪${Number(value).toFixed(2)}`, 'Spent']}
+                formatter={(value: unknown) => [formatCurrency(Number(value), true), 'Spent']}
                 contentStyle={{
                   borderRadius: '12px',
                   border: 'none',

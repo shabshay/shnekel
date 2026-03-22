@@ -4,9 +4,10 @@ import { ExpenseItem } from './ExpenseItem';
 interface ExpenseListProps {
   expenses: Expense[];
   onDelete?: (id: string) => void;
+  onEdit?: (expense: Expense) => void;
 }
 
-export function ExpenseList({ expenses, onDelete }: ExpenseListProps) {
+export function ExpenseList({ expenses, onDelete, onEdit }: ExpenseListProps) {
   if (expenses.length === 0) {
     return (
       <div className="text-center py-12">
@@ -19,7 +20,7 @@ export function ExpenseList({ expenses, onDelete }: ExpenseListProps) {
   return (
     <div className="space-y-5">
       {expenses.map(expense => (
-        <ExpenseItem key={expense.id} expense={expense} onDelete={onDelete} />
+        <ExpenseItem key={expense.id} expense={expense} onDelete={onDelete} onEdit={onEdit} />
       ))}
     </div>
   );
