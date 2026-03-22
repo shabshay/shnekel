@@ -25,7 +25,17 @@
       "Bash(git push:*)",
       "Bash(gh auth:*)",
       "Bash(gh api:*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(npx supabase:*)",
+      "Bash(brew install:*)",
+      "Bash(supabase --version)",
+      "Bash(supabase orgs:*)",
+      "Bash(1:*)",
+      "Bash(supabase projects:*)",
+      "Bash(supabase db:*)",
+      "Bash(export PATH=/opt/homebrew/bin:$PATH)",
+      "Bash(gh secret:*)"
     ]
   }
 }

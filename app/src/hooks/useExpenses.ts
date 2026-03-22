@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Expense, Category, Period } from '../types';
-import { getExpenses, addExpense as addExpenseToStorage, deleteExpense as deleteExpenseFromStorage } from '../lib/storage';
+import { getExpenses, addExpense as addExpenseToStorage, addExpensesBatch as addExpensesBatchToStorage, deleteExpense as deleteExpenseFromStorage } from '../lib/storage';
 
 function getPeriodStart(period: Period, monthStartDay: number = 1): Date {
   const now = new Date();
@@ -52,6 +52,13 @@ export function getTimeUntilReset(period: Period, monthStartDay: number = 1): st
 export function useExpenses(period: Period, budgetAmount: number, monthStartDay: number = 1) {
   const [expenses, setExpenses] = useState<Expense[]>(getExpenses);
 
+  // Re-read from localStorage when a sync pull completes
+  useEffect(() => {
+    const handler = () => setExpenses(getExpenses());
+    window.addEventListener('shnekel-sync', handler);
+    return () => window.removeEventListener('shnekel-sync', handler);
+  }, []);
+
   const addExpense = useCallback((amount: number, category: Category, description: string) => {
     const expense: Expense = {
       id: crypto.randomUUID(),
@@ -61,6 +68,11 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
       date: new Date().toISOString(),
     };
     const updated = addExpenseToStorage(expense);
+    setExpenses(updated);
+  }, []);
+
+  const addExpensesBatch = useCallback((newExpenses: Expense[]) => {
+    const updated = addExpensesBatchToStorage(newExpenses);
     setExpenses(updated);
   }, []);
 
@@ -89,6 +101,7 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
     remaining,
     progress,
     addExpense,
+    addExpensesBatch,
     removeExpense,
   };
 }

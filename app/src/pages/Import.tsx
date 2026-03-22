@@ -1,8 +1,8 @@
 import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parseImportFile, downloadTemplate, type ImportedRow, type DetectedFormat } from '../lib/importParser';
-import { addExpense } from '../lib/storage';
-import { CATEGORIES, type Category } from '../types';
+import { addExpensesBatch } from '../lib/storage';
+import { CATEGORIES, type Category, type Expense } from '../types';
 
 type Step = 'upload' | 'preview' | 'done';
 
@@ -57,20 +57,20 @@ export function Import() {
   };
 
   const handleImport = () => {
-    let count = 0;
+    const expenses: Expense[] = [];
     for (const idx of selectedRows) {
       const row = rows[idx];
       const category = categoryOverrides.get(idx) ?? row.category;
-      addExpense({
+      expenses.push({
         id: crypto.randomUUID(),
         amount: row.amount,
         category,
         description: row.description,
         date: row.date,
       });
-      count++;
     }
-    setImportedCount(count);
+    addExpensesBatch(expenses);
+    setImportedCount(expenses.length);
     setStep('done');
   };
 

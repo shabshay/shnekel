@@ -1,9 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { Settings, Period } from '../types';
 import { getSettings, saveSettings } from '../lib/storage';
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(getSettings);
+
+  // Re-read from localStorage when a sync pull completes
+  useEffect(() => {
+    const handler = () => setSettings(getSettings());
+    window.addEventListener('shnekel-sync', handler);
+    return () => window.removeEventListener('shnekel-sync', handler);
+  }, []);
 
   const updateSettings = useCallback((updates: Partial<Settings>) => {
     setSettings(prev => {
