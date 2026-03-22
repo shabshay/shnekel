@@ -22,12 +22,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const totalSteps = period === 'monthly' ? 3 : 2;
 
   const handleContinueStep1 = () => {
-    if (period === 'monthly') {
-      setStep(2); // go to month start day picker
-    } else {
-      setStep(period === 'monthly' ? 2 : 2); // skip to budget for non-monthly
-      setStep(2);
-    }
+    setStep(2);
   };
 
   const getNextStepFromMonthDay = () => setStep(3);

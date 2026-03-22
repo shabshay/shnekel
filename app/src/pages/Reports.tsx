@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { getExpenses, getSettings } from '../lib/storage';
 import { getExpenseStats } from '../hooks/useExpenses';
 import { StatsCard } from '../components/StatsCard';
@@ -89,7 +89,7 @@ export function Reports() {
                 tickFormatter={v => `₪${v}`}
               />
               <Tooltip
-                formatter={(value: number) => [`₪${value.toFixed(2)}`, 'Spent']}
+                formatter={(value: unknown) => [`₪${Number(value).toFixed(2)}`, 'Spent']}
                 contentStyle={{
                   borderRadius: '12px',
                   border: 'none',

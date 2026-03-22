@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useSettings } from './hooks/useSettings';
 import { Layout } from './components/Layout';
 import { Onboarding } from './pages/Onboarding';
@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useExpenses } from './hooks/useExpenses';
 import type { Category } from './types';
 
-function AddExpensePage({ settings, updateSettings }: { settings: ReturnType<typeof useSettings>['settings']; updateSettings: ReturnType<typeof useSettings>['updateSettings'] }) {
+function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>['settings']; updateSettings: ReturnType<typeof useSettings>['updateSettings'] }) {
   const { addExpense } = useExpenses(settings.period, settings.budgetAmount, settings.monthStartDay);
   const [open] = useState(true);
 
@@ -34,7 +34,7 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard settings={settings} onUpdateSettings={updateSettings} />} />
@@ -44,7 +44,7 @@ function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
