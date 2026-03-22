@@ -164,6 +164,7 @@ export async function pullFromSupabase(): Promise<boolean> {
         period: remoteSettings.period,
         budgetAmount: Number(remoteSettings.budget_amount),
         monthStartDay: Number(remoteSettings.month_start_day),
+        alertThreshold: Number(remoteSettings.alert_threshold ?? 80),
         onboardingComplete: remoteSettings.onboarding_complete,
       };
       localStorage.setItem('shnekel_settings', JSON.stringify(settings));

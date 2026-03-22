@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { RecurringExpense, RecurringFrequency, Category } from '../types';
-import { CATEGORIES } from '../types';
+import { getCategories } from '../lib/storage';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatCurrency } from '../lib/format';
@@ -225,7 +225,7 @@ export function Recurring() {
             {/* Category */}
             <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Category</label>
             <div className="grid grid-cols-4 gap-2 mb-4">
-              {CATEGORIES.map(cat => (
+              {getCategories().map(cat => (
                 <button
                   key={cat.key}
                   onClick={() => setCategory(cat.key)}

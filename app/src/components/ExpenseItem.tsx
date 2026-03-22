@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { Expense } from '../types';
 import { CategoryIcon } from './CategoryIcon';
-import { CATEGORIES } from '../types';
 import { formatCurrency } from '../lib/format';
+import { getCategories } from '../lib/storage';
 import { ConfirmDialog } from './ConfirmDialog';
 
 interface ExpenseItemProps {
@@ -25,7 +25,7 @@ function formatTime(dateStr: string): string {
 }
 
 export function ExpenseItem({ expense, onDelete, onEdit }: ExpenseItemProps) {
-  const cat = CATEGORIES.find(c => c.key === expense.category);
+  const cat = getCategories().find(c => c.key === expense.category);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -38,8 +38,10 @@ export function ExpenseItem({ expense, onDelete, onEdit }: ExpenseItemProps) {
           <CategoryIcon category={expense.category} />
           <div className="min-w-0">
             <p className="font-headline font-bold text-on-primary-fixed text-sm truncate">{expense.description}</p>
-            <p className="font-body text-xs text-on-surface-variant">
+            <p className="font-body text-xs text-on-surface-variant flex items-center gap-1">
               {cat?.label} &middot; {formatTime(expense.date)}
+              {expense.notes && <span className="material-symbols-outlined text-xs">sticky_note_2</span>}
+              {expense.receiptUrl && <span className="material-symbols-outlined text-xs">receipt</span>}
             </p>
           </div>
         </div>

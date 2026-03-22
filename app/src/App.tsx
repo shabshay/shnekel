@@ -8,6 +8,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Reports } from './pages/Reports';
 import { Import } from './pages/Import';
 import { Recurring } from './pages/Recurring';
+import { Categories } from './pages/Categories';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { useState, useEffect } from 'react';
 import { useExpenses } from './hooks/useExpenses';
@@ -23,8 +24,8 @@ function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>
     <AddExpenseModal
       open={open}
       onClose={() => window.history.back()}
-      onAdd={(amount: number, category: Category, description: string) => {
-        addExpense(amount, category, description);
+      onAdd={(amount: number, category: Category, description: string, notes?: string, receiptUrl?: string) => {
+        addExpense(amount, category, description, notes, receiptUrl);
         window.history.back();
       }}
     />
@@ -60,6 +61,7 @@ function AuthenticatedApp() {
           <Route path="/add" element={<AddExpensePage settings={settings} />} />
           <Route path="/import" element={<Import />} />
           <Route path="/recurring" element={<Recurring />} />
+          <Route path="/categories" element={<Categories />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

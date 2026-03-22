@@ -2,7 +2,8 @@ import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parseImportFile, downloadTemplate, type ImportedRow, type DetectedFormat } from '../lib/importParser';
 import { addExpensesBatch } from '../lib/storage';
-import { CATEGORIES, type Category, type Expense } from '../types';
+import { type Category, type Expense } from '../types';
+import { getCategories } from '../lib/storage';
 import { formatCurrency } from '../lib/format';
 
 type Step = 'upload' | 'preview' | 'done';
@@ -251,7 +252,7 @@ export function Import() {
           <div className="space-y-2 mb-6 max-h-[50vh] overflow-y-auto">
             {rows.map((row, idx) => {
               const cat = categoryOverrides.get(idx) ?? row.category;
-              const catInfo = CATEGORIES.find(c => c.key === cat)!;
+              const catInfo = getCategories().find(c => c.key === cat)!;
               const isSelected = selectedRows.has(idx);
 
               return (
@@ -290,7 +291,7 @@ export function Import() {
                     className="bg-surface rounded-lg px-2 py-1 text-xs font-semibold border-none outline-none flex-shrink-0"
                     style={{ color: catInfo.color }}
                   >
-                    {CATEGORIES.map(c => (
+                    {getCategories().map(c => (
                       <option key={c.key} value={c.key}>{c.label}</option>
                     ))}
                   </select>

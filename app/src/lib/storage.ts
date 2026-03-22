@@ -1,4 +1,5 @@
-import type { Settings, Expense, RecurringExpense } from '../types';
+import type { Settings, Expense, RecurringExpense, CategoryInfo } from '../types';
+import { DEFAULT_CATEGORIES } from '../types';
 import { enqueueSync } from './sync';
 
 const SETTINGS_KEY = 'shnekel_settings';
@@ -9,6 +10,7 @@ const DEFAULT_SETTINGS: Settings = {
   period: 'daily',
   budgetAmount: 200,
   monthStartDay: 1,
+  alertThreshold: 80,
   onboardingComplete: false,
 };
 
@@ -23,6 +25,14 @@ export function getSettings(): Settings {
 export function saveSettings(settings: Settings): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   enqueueSync({ type: 'upsert_settings', payload: settings, timestamp: Date.now() });
+}
+
+// ─── Categories ─────────────────────────────────────────────────
+
+export function getCategories(): CategoryInfo[] {
+  const settings = getSettings();
+  const custom = settings.customCategories ?? [];
+  return [...DEFAULT_CATEGORIES, ...custom];
 }
 
 // ─── Expenses ───────────────────────────────────────────────────

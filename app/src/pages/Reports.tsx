@@ -4,8 +4,9 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaCh
 import { getExpenses, getSettings } from '../lib/storage';
 import { getExpenseStats } from '../hooks/useExpenses';
 import { StatsCard } from '../components/StatsCard';
-import { CATEGORIES } from '../types';
+import { getCategories } from '../lib/storage';
 import { formatCurrency } from '../lib/format';
+import { exportExpenses } from '../lib/exportData';
 
 type FilterPeriod = 'today' | 'week' | 'month';
 
@@ -17,8 +18,8 @@ export function Reports() {
 
   const stats = useMemo(() => getExpenseStats(expenses, filter, settings.monthStartDay), [expenses, filter, settings.monthStartDay]);
 
-  const topCatLabel = CATEGORIES.find(c => c.key === stats.topCategory)?.label || stats.topCategory;
-  const topCatColor = CATEGORIES.find(c => c.key === stats.topCategory)?.color;
+  const topCatLabel = getCategories().find(c => c.key === stats.topCategory)?.label || stats.topCategory;
+  const topCatColor = getCategories().find(c => c.key === stats.topCategory)?.color;
 
   const filters: { key: FilterPeriod; label: string }[] = [
     { key: 'today', label: 'Today' },
@@ -36,7 +37,14 @@ export function Reports() {
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Reports</h1>
+        <h1 className="font-headline font-bold text-2xl text-on-primary-fixed flex-grow">Reports</h1>
+        <button
+          onClick={() => exportExpenses(stats.filteredExpenses, stats, filters.find(f => f.key === filter)!.label)}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-primary-fixed font-semibold text-sm transition-colors"
+        >
+          <span className="material-symbols-outlined text-lg">download</span>
+          Export
+        </button>
       </div>
 
       {/* Time filter */}

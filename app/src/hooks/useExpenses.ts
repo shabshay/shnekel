@@ -59,13 +59,15 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
     return () => window.removeEventListener('shnekel-sync', handler);
   }, []);
 
-  const addExpense = useCallback((amount: number, category: Category, description: string) => {
+  const addExpense = useCallback((amount: number, category: Category, description: string, notes?: string, receiptUrl?: string) => {
     const expense: Expense = {
       id: crypto.randomUUID(),
       amount,
       category,
       description,
       date: new Date().toISOString(),
+      ...(notes && { notes }),
+      ...(receiptUrl && { receiptUrl }),
     };
     const updated = addExpenseToStorage(expense);
     setExpenses(updated);

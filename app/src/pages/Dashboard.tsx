@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { BalanceGauge } from '../components/BalanceGauge';
 import { ExpenseList } from '../components/ExpenseList';
 import { AddExpenseModal } from '../components/AddExpenseModal';
+import { BudgetAlert } from '../components/BudgetAlert';
 
 interface DashboardProps {
   settings: Settings;
@@ -38,8 +39,8 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
     return () => clearInterval(interval);
   }, [settings.period, settings.monthStartDay]);
 
-  const handleAdd = (amount: number, category: Category, description: string) => {
-    addExpense(amount, category, description);
+  const handleAdd = (amount: number, category: Category, description: string, notes?: string, receiptUrl?: string) => {
+    addExpense(amount, category, description, notes, receiptUrl);
   };
 
   const handleEdit = (expense: Expense) => {
@@ -120,14 +121,39 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
             </div>
           )}
 
-          {/* Import link */}
-          <button
-            onClick={() => { setShowSettings(false); navigate('/import'); }}
-            className="w-full flex items-center gap-3 py-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">upload_file</span>
-            <span className="font-semibold text-sm">Import expenses from file</span>
-          </button>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">
+              Alert at (%)
+            </label>
+            <input
+              type="number"
+              min="50"
+              max="100"
+              value={settings.alertThreshold ?? 80}
+              onChange={e => {
+                const v = parseInt(e.target.value);
+                if (v >= 50 && v <= 100) onUpdateSettings({ alertThreshold: v });
+              }}
+              className="w-full bg-surface rounded-lg px-4 py-2 font-headline font-bold text-on-primary-fixed border-none outline-none"
+            />
+          </div>
+          {/* Quick links */}
+          <div className="space-y-1">
+            <button
+              onClick={() => { setShowSettings(false); navigate('/categories'); }}
+              className="w-full flex items-center gap-3 py-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">category</span>
+              <span className="font-semibold text-sm">Manage categories</span>
+            </button>
+            <button
+              onClick={() => { setShowSettings(false); navigate('/import'); }}
+              className="w-full flex items-center gap-3 py-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">upload_file</span>
+              <span className="font-semibold text-sm">Import expenses from file</span>
+            </button>
+          </div>
 
           {/* Sign out */}
           <div className="pt-2 border-t border-outline-variant/20">
@@ -146,6 +172,9 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
           </div>
         </div>
       )}
+
+      {/* Budget Alert */}
+      <BudgetAlert progress={progress} remaining={remaining} threshold={settings.alertThreshold ?? 80} />
 
       {/* Gauge */}
       <div className="mb-8">
