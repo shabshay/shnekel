@@ -21,7 +21,11 @@
       "Read(//usr/local/bin/**)",
       "Bash(npm run:*)",
       "Bash(/opt/homebrew/bin/npm run:*)",
-      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")"
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh api:*)",
+      "Bash(gh run:*)"
     ]
   }
 }
