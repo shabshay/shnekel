@@ -7,6 +7,8 @@ import { BalanceGauge } from '../components/BalanceGauge';
 import { ExpenseList } from '../components/ExpenseList';
 import { AddExpenseModal } from '../components/AddExpenseModal';
 import { BudgetAlert } from '../components/BudgetAlert';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { resetAllData } from '../lib/storage';
 import { getCategories } from '../lib/storage';
 import { CategoryBreakdown } from '../components/CategoryBreakdown';
 import { CoinLogo } from '../components/CoinLogo';
@@ -37,6 +39,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   const [resetTime, setResetTime] = useState(getTimeUntilReset(settings.period, settings.monthStartDay));
   const [showSettings, setShowSettings] = useState(false);
   const [search, setSearch] = useState('');
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const navigate = useNavigate();
 
   const filteredExpenses = useMemo(() => {
@@ -194,13 +197,20 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                 </button>
               </div>
 
-              {/* Sign out */}
-              <div className="pt-2 border-t border-outline-variant/20">
-                <div className="flex items-center justify-between">
-                  <p className="text-on-surface-variant text-xs truncate">{user?.email}</p>
+              {/* Account */}
+              <div className="pt-2 border-t border-outline-variant/20 space-y-2">
+                <p className="text-on-surface-variant text-xs truncate">{user?.email}</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowResetConfirm(true)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-error text-sm font-semibold bg-error/5 hover:bg-error/10 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-lg">delete_forever</span>
+                    Reset data
+                  </button>
                   <button
                     onClick={signOut}
-                    className="flex items-center gap-1.5 py-2 px-3 rounded-lg text-error text-sm font-semibold hover:bg-error/5 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-on-surface-variant text-sm font-semibold bg-surface hover:bg-surface-container transition-colors"
                   >
                     <span className="material-symbols-outlined text-lg">logout</span>
                     Sign out
@@ -316,6 +326,22 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         onAdd={handleAdd}
         onUpdate={handleUpdate}
         editExpense={editingExpense}
+      />
+
+      {/* Reset confirm */}
+      <ConfirmDialog
+        open={showResetConfirm}
+        title="Reset all data?"
+        message="This will permanently delete all your expenses, recurring items, categories, and settings. You'll start fresh as if you just signed up. This cannot be undone."
+        confirmLabel="Delete everything"
+        confirmDestructive
+        onConfirm={async () => {
+          setShowResetConfirm(false);
+          setShowSettings(false);
+          await resetAllData();
+          window.location.reload();
+        }}
+        onCancel={() => setShowResetConfirm(false)}
       />
     </div>
   );

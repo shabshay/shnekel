@@ -109,6 +109,31 @@ export function deleteRecurringExpense(id: string): RecurringExpense[] {
   return items;
 }
 
+// ─── Reset ──────────────────────────────────────────────────────
+
+/**
+ * Delete all user data from localStorage and Supabase.
+ * Keeps the user signed in but resets to a fresh state.
+ */
+export async function resetAllData(): Promise<void> {
+  // Clear localStorage
+  localStorage.removeItem(SETTINGS_KEY);
+  localStorage.removeItem(EXPENSES_KEY);
+  localStorage.removeItem(RECURRING_KEY);
+  localStorage.removeItem('shnekel_sync_queue');
+  localStorage.removeItem('shnekel_migrated');
+
+  // Clear Supabase data
+  const { supabase } = await import('./supabase');
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from('expenses').delete().eq('user_id', user.id);
+      await supabase.from('settings').delete().eq('user_id', user.id);
+    }
+  }
+}
+
 /**
  * Generate expenses from active recurring templates that are due.
  * Called on app startup. Checks each recurring expense and creates
