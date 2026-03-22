@@ -7,6 +7,8 @@ import { BalanceGauge } from '../components/BalanceGauge';
 import { ExpenseList } from '../components/ExpenseList';
 import { AddExpenseModal } from '../components/AddExpenseModal';
 import { BudgetAlert } from '../components/BudgetAlert';
+import { CategoryBreakdown } from '../components/CategoryBreakdown';
+import { CoinLogo } from '../components/CoinLogo';
 
 interface DashboardProps {
   settings: Settings;
@@ -54,10 +56,13 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   return (
     <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Balance</h1>
-          <p className="text-on-surface-variant text-sm">Spend like it's cash.</p>
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-3">
+          <CoinLogo size="sm" />
+          <div>
+            <h1 className="font-headline font-bold text-xl text-on-primary-fixed">Shnekel</h1>
+            <p className="text-on-surface-variant text-xs">Spend like it's cash.</p>
+          </div>
         </div>
         <button
           onClick={() => setShowSettings(!showSettings)}
@@ -185,6 +190,14 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
           resetTime={resetTime}
         />
       </div>
+
+      {/* Category Breakdown */}
+      {currentPeriodExpenses.length > 0 && (
+        <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-3">Spending by category</h3>
+          <CategoryBreakdown expenses={currentPeriodExpenses} budget={settings.budgetAmount} />
+        </div>
+      )}
 
       {/* Add Expense Button */}
       <button

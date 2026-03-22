@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { CoinLogo } from '../components/CoinLogo';
 
 export function Login() {
   const { signInWithEmail } = useAuth();
@@ -29,7 +30,8 @@ export function Login() {
       <div className="flex-grow flex items-center justify-center px-6">
         <div className="max-w-md w-full">
           {/* Logo */}
-          <div className="text-center mb-12">
+          <div className="flex flex-col items-center mb-12">
+            <CoinLogo size="xl" className="mb-4" />
             <h1 className="font-headline font-black text-primary-container text-4xl tracking-tight mb-2">
               Shnekel
             </h1>

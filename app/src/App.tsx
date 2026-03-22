@@ -15,6 +15,7 @@ import { useExpenses } from './hooks/useExpenses';
 import { pullFromSupabase, migrateLocalToSupabase } from './lib/sync';
 import { processRecurringExpenses } from './lib/storage';
 import type { Category } from './types';
+import { CoinLogo } from './components/CoinLogo';
 
 function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>['settings'] }) {
   const { addExpense } = useExpenses(settings.period, settings.budgetAmount, settings.monthStartDay);
@@ -76,9 +77,7 @@ function App() {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-surface">
         <div className="flex flex-col items-center gap-4">
-          <span className="material-symbols-outlined text-primary-container text-4xl animate-spin">
-            progress_activity
-          </span>
+          <CoinLogo size="xl" animate />
           <h1 className="font-headline font-black text-primary-container text-2xl tracking-tight">
             Shnekel
           </h1>

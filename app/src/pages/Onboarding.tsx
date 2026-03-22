@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Period } from '../types';
+import { CoinLogo } from '../components/CoinLogo';
 
 interface OnboardingProps {
   onComplete: (period: Period, budget: number, monthStartDay?: number) => void;
@@ -33,9 +34,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     <div className="min-h-dvh flex flex-col bg-surface">
       {/* Header */}
       <header className="px-6 py-6 flex justify-between items-center">
-        <h1 className="font-headline font-black text-primary-container text-2xl tracking-tight">
-          Shnekel
-        </h1>
+        <div className="flex items-center gap-2">
+          <CoinLogo size="sm" />
+          <h1 className="font-headline font-black text-primary-container text-2xl tracking-tight">
+            Shnekel
+          </h1>
+        </div>
         <span className="text-on-surface-variant font-medium text-sm">Step {step} of {totalSteps}</span>
       </header>
 
