@@ -12,15 +12,25 @@ const periodOptions: { key: Period; label: string; desc: string; icon: string }[
   { key: 'monthly', label: 'Monthly', desc: 'Reset every month', icon: 'calendar_month' },
 ];
 
-const presets = [100, 200, 500];
+const presetsByPeriod: Record<Period, number[]> = {
+  daily: [50, 100, 200],
+  weekly: [500, 1000, 2000],
+  monthly: [3000, 5000, 10000],
+};
 
 export function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [period, setPeriod] = useState<Period>('daily');
-  const [budget, setBudget] = useState('200');
+  const [budget, setBudget] = useState('100');
   const [monthStartDay, setMonthStartDay] = useState(1);
 
   const totalSteps = period === 'monthly' ? 3 : 2;
+
+  const handleSelectPeriod = (p: Period) => {
+    setPeriod(p);
+    // Set default budget to the middle preset for the selected period
+    setBudget(String(presetsByPeriod[p][1]));
+  };
 
   const handleContinueStep1 = () => {
     setStep(2);
@@ -66,7 +76,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 {periodOptions.map(opt => (
                   <button
                     key={opt.key}
-                    onClick={() => setPeriod(opt.key)}
+                    onClick={() => handleSelectPeriod(opt.key)}
                     className={`w-full flex items-center p-5 rounded-xl transition-all duration-200 ${
                       period === opt.key
                         ? 'bg-primary-container text-white'
@@ -186,17 +196,17 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
               {/* Presets */}
               <div className="flex gap-3 mb-10">
-                {presets.map(p => (
+                {presetsByPeriod[period].map(p => (
                   <button
                     key={p}
                     onClick={() => setBudget(String(p))}
-                    className={`flex-1 py-3 rounded-xl font-headline font-semibold text-sm transition-all ${
+                    className={`flex-1 py-3 rounded-xl font-headline font-semibold text-sm transition-all active:scale-95 ${
                       budget === String(p)
                         ? 'bg-primary-container text-white'
                         : 'bg-surface-container-lowest text-on-primary-fixed hover:bg-surface-container'
                     }`}
                   >
-                    ₪{p}
+                    ₪{p.toLocaleString()}
                   </button>
                 ))}
               </div>
