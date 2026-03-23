@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useSettings } from './hooks/useSettings';
 import { useAuth } from './hooks/useAuth';
 import { Layout } from './components/Layout';
@@ -19,15 +19,16 @@ import { CoinLogo } from './components/CoinLogo';
 
 function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>['settings'] }) {
   const { addExpense } = useExpenses(settings.period, settings.budgetAmount, settings.monthStartDay);
+  const navigate = useNavigate();
   const [open] = useState(true);
 
   return (
     <AddExpenseModal
       open={open}
-      onClose={() => window.history.back()}
+      onClose={() => navigate('/')}
       onAdd={(amount: number, category: Category, description: string, notes?: string, receiptUrl?: string) => {
         addExpense(amount, category, description, notes, receiptUrl);
-        window.history.back();
+        navigate('/');
       }}
     />
   );

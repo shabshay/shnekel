@@ -52,8 +52,10 @@ async function processOp(op: SyncOp): Promise<boolean> {
           period: s.period,
           budget_amount: s.budgetAmount,
           month_start_day: s.monthStartDay,
-          onboarding_complete: s.onboardingComplete,
+          alert_threshold: s.alertThreshold ?? 80,
+          dark_mode: s.darkMode ?? false,
           date_mode: s.dateMode ?? 'transaction',
+          onboarding_complete: s.onboardingComplete,
           updated_at: new Date().toISOString(),
         });
         if (error) throw error;
