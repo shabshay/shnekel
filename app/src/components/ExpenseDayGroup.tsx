@@ -15,7 +15,7 @@ export function ExpenseDayGroup({ label, expenses, onDelete, onEdit }: ExpenseDa
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">{label}</span>
+        <span className="text-xs font-semibold tracking-wide text-on-surface-variant">{label}</span>
         <span className="text-xs font-bold text-on-primary-fixed">{formatCurrency(dayTotal)}</span>
       </div>
       <div className="space-y-4">

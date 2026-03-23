@@ -89,7 +89,12 @@ export function getTimeUntilReset(period: Period, monthStartDay: number = 1): st
   const diff = end.getTime() - now.getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  return `${hours}h ${minutes}m`;
+  const days = Math.ceil(hours / 24);
+
+  if (hours > 48) return `${days} days`;
+  if (hours > 24) return `${days} day${days > 1 ? 's' : ''}`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
 }
 
 /**

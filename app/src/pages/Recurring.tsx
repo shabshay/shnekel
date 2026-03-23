@@ -198,7 +198,7 @@ export function Recurring() {
 
             {/* Amount */}
             <div className="bg-surface rounded-xl p-5 mb-4">
-              <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Amount</label>
+              <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Amount</label>
               <div className="flex items-baseline gap-1">
                 <span className="font-headline text-on-primary-fixed font-bold text-2xl">₪</span>
                 <input
@@ -223,7 +223,7 @@ export function Recurring() {
             />
 
             {/* Category */}
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Category</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Category</label>
             <div className="grid grid-cols-4 gap-2 mb-4">
               {getCategories().map(cat => (
                 <button
@@ -244,7 +244,7 @@ export function Recurring() {
             </div>
 
             {/* Frequency */}
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Frequency</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Frequency</label>
             <div className="flex gap-2 mb-4">
               {FREQ_OPTIONS.map(f => (
                 <button
@@ -263,7 +263,7 @@ export function Recurring() {
             {/* Day picker */}
             {frequency === 'monthly' && (
               <div className="mb-4">
-                <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Day of month</label>
+                <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Day of month</label>
                 <select
                   value={dayOfMonth}
                   onChange={e => setDayOfMonth(parseInt(e.target.value))}
@@ -278,7 +278,7 @@ export function Recurring() {
 
             {frequency === 'weekly' && (
               <div className="mb-4">
-                <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Day of week</label>
+                <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Day of week</label>
                 <div className="grid grid-cols-7 gap-1">
                   {DAYS_OF_WEEK.map((label, i) => (
                     <button

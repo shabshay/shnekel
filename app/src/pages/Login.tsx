@@ -62,7 +62,7 @@ export function Login() {
           ) : (
             /* Login form */
             <form onSubmit={handleSubmit}>
-              <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-3">
+              <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-3">
                 Email address
               </label>
               <input

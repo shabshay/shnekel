@@ -106,7 +106,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
             <div className="space-y-5">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Period</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Period</label>
                 <div className="flex gap-2">
                   {(['daily', 'weekly', 'monthly'] as const).map(p => (
                     <button
@@ -125,7 +125,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Budget (₪)</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Budget (₪)</label>
                 <input
                   type="number"
                   value={settings.budgetAmount}
@@ -139,7 +139,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
               {settings.period === 'monthly' && (
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Month starts on day</label>
+                  <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Month starts on day</label>
                   <select
                     value={settings.monthStartDay}
                     onChange={e => onUpdateSettings({ monthStartDay: parseInt(e.target.value) })}
@@ -153,7 +153,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
               )}
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Alert at (%)</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Alert at (%)</label>
                 <input
                   type="number"
                   min="50"
@@ -169,7 +169,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
               {/* Date mode toggle */}
               <div>
-                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Calculate by</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Calculate by</label>
                 <div className="flex gap-2">
                   {([['transaction', 'Transaction date'], ['billing', 'Billing date']] as const).map(([key, label]) => (
                     <button
@@ -189,7 +189,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
               {/* Dark mode toggle */}
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">Dark mode</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant">Dark mode</label>
                 <button
                   onClick={() => onUpdateSettings({ darkMode: !settings.darkMode })}
                   className="text-on-surface-variant hover:text-on-primary-fixed transition-colors"
@@ -273,6 +273,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       <div className="mb-8">
         <BalanceGauge
           remaining={remaining}
+          budget={settings.budgetAmount}
           progress={progress}
           periodLabel={isCurrentPeriod ? periodLabels[settings.period] : 'spent'}
           resetTime={isCurrentPeriod ? resetTime : ''}
@@ -282,7 +283,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       {/* Category Breakdown */}
       {currentPeriodExpenses.length > 0 && (
         <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-3">Spending by category</h3>
+          <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Spending by category</h3>
           <CategoryBreakdown expenses={currentPeriodExpenses} budget={settings.budgetAmount} />
         </div>
       )}

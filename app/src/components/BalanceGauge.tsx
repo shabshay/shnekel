@@ -2,12 +2,13 @@ import { formatCurrency } from '../lib/format';
 
 interface BalanceGaugeProps {
   remaining: number;
+  budget: number;
   progress: number;
   periodLabel: string;
   resetTime: string;
 }
 
-export function BalanceGauge({ remaining, progress, periodLabel, resetTime }: BalanceGaugeProps) {
+export function BalanceGauge({ remaining, budget, progress, periodLabel, resetTime }: BalanceGaugeProps) {
   const radius = 130;
   const stroke = 12;
   const normalizedRadius = radius - stroke / 2;
@@ -54,14 +55,20 @@ export function BalanceGauge({ remaining, progress, periodLabel, resetTime }: Ba
           <span className={`font-headline font-extrabold text-5xl tracking-tight ${isOverBudget ? 'text-error' : 'text-on-primary-fixed'}`}>
             {formatCurrency(remaining)}
           </span>
-          <span className={`font-headline font-semibold text-base mt-1 ${isOverBudget ? 'text-error' : 'text-on-tertiary-container'}`}>
+          <span className={`font-headline font-semibold text-sm mt-1 ${isOverBudget ? 'text-error' : 'text-on-tertiary-container'}`}>
             {isOverBudget ? 'over budget' : periodLabel}
+          </span>
+          {/* Budget context pill */}
+          <span className="text-xs text-on-surface-variant bg-surface-container rounded-full px-3 py-1 mt-2">
+            of {formatCurrency(budget)} budget
           </span>
         </div>
       </div>
-      <p className="text-on-surface-variant text-sm mt-4">
-        Resets in <span className="font-semibold text-on-primary-fixed">{resetTime}</span>
-      </p>
+      {resetTime && (
+        <p className="text-on-surface-variant text-sm mt-4">
+          Resets in <span className="font-semibold text-on-tertiary-container">{resetTime}</span>
+        </p>
+      )}
     </div>
   );
 }

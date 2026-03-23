@@ -96,7 +96,7 @@ export function Categories() {
       </div>
 
       {/* Default categories */}
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-3">Default</h3>
+      <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Default</h3>
       <div className="space-y-2 mb-8">
         {categories.filter(c => c.isDefault).map(cat => (
           <div key={cat.key} className="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 opacity-70">
@@ -114,7 +114,7 @@ export function Categories() {
 
       {/* Custom categories */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">Custom</h3>
+        <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant">Custom</h3>
       </div>
       {customCategories.length === 0 ? (
         <div className="text-center py-8">
@@ -170,7 +170,7 @@ export function Categories() {
             </h2>
 
             {/* Name */}
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Name</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Name</label>
             <input
               type="text"
               value={label}
@@ -181,7 +181,7 @@ export function Categories() {
             />
 
             {/* Icon picker */}
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Icon</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Icon</label>
             <div className="grid grid-cols-7 gap-2 mb-5">
               {AVAILABLE_ICONS.map(ic => (
                 <button
@@ -202,7 +202,7 @@ export function Categories() {
             </div>
 
             {/* Color picker */}
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-2">Color</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Color</label>
             <div className="grid grid-cols-7 gap-2 mb-6">
               {AVAILABLE_COLORS.map(c => (
                 <button

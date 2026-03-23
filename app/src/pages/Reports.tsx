@@ -82,7 +82,7 @@ export function Reports() {
       {filter === 'custom' && (
         <div className="flex gap-3 mb-6">
           <div className="flex-1">
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-1">From</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-1">From</label>
             <input
               type="date"
               value={customStart}
@@ -91,7 +91,7 @@ export function Reports() {
             />
           </div>
           <div className="flex-1">
-            <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-1">To</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-1">To</label>
             <input
               type="date"
               value={customEnd}
@@ -128,8 +128,8 @@ export function Reports() {
                 <AreaChart data={stats.chartData}>
                   <defs>
                     <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#009668" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#009668" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eceef0" />
@@ -157,15 +157,27 @@ export function Reports() {
                   <Area
                     type="monotone"
                     dataKey="amount"
-                    stroke="#009668"
+                    stroke="#10b981"
                     strokeWidth={3}
                     fill="url(#colorAmount)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-48 flex items-center justify-center text-on-surface-variant text-sm">
-                No data for this period yet
+              <div className="h-48 flex flex-col items-center justify-center gap-4">
+                {/* Ghost chart skeleton */}
+                <div className="flex items-end gap-2 h-24 w-full max-w-xs">
+                  {[35, 55, 25, 70, 45, 60, 30].map((h, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 bg-surface-container rounded animate-pulse"
+                      style={{ height: `${h}%` }}
+                    />
+                  ))}
+                </div>
+                <p className="text-on-surface-variant text-sm text-center">
+                  Start adding expenses to see your spending trends
+                </p>
               </div>
             )}
           </div>

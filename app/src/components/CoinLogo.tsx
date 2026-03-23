@@ -27,9 +27,9 @@ export function CoinLogo({ size = 'md', className = '', animate = false }: CoinL
     >
       <defs>
         <linearGradient id={`coin-grad-${size}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1a2540" />
-          <stop offset="50%" stopColor="#131b2e" />
-          <stop offset="100%" stopColor="#0f1520" />
+          <stop offset="0%" stopColor="#1e293b" />
+          <stop offset="50%" stopColor="#0f172a" />
+          <stop offset="100%" stopColor="#0a0f1a" />
         </linearGradient>
       </defs>
 
@@ -47,7 +47,7 @@ export function CoinLogo({ size = 'md', className = '', animate = false }: CoinL
           <line
             key={i}
             x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke="#131b2e"
+            stroke="#0f172a"
             strokeWidth={1}
             strokeLinecap="round"
             opacity={0.3}
@@ -61,7 +61,7 @@ export function CoinLogo({ size = 'md', className = '', animate = false }: CoinL
         cy={s / 2}
         r={r}
         fill={`url(#coin-grad-${size})`}
-        stroke="#1a2540"
+        stroke="#1e293b"
         strokeWidth={1.5}
       />
 
@@ -71,7 +71,7 @@ export function CoinLogo({ size = 'md', className = '', animate = false }: CoinL
         cy={s / 2}
         r={innerR}
         fill="none"
-        stroke="#2a3a5c"
+        stroke="#334155"
         strokeWidth={0.75}
         opacity={0.5}
       />
@@ -97,7 +97,7 @@ export function CoinLogo({ size = 'md', className = '', animate = false }: CoinL
         y={s / 2 - s * 0.14}
         textAnchor="middle"
         dominantBaseline="central"
-        fill="#4edea3"
+        fill="#fef3c7"
         fontFamily="Lexend, sans-serif"
         fontWeight="700"
         fontSize={s * 0.15}

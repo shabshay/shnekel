@@ -39,7 +39,7 @@ function AuthenticatedApp() {
   // Apply dark mode
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', settings.darkMode ? '#0f1218' : '#f7f9fb');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', settings.darkMode ? '#020617' : '#f8fafc');
   }, [settings.darkMode]);
 
   // On mount: process recurring, migrate local data & pull remote data

@@ -72,10 +72,10 @@ describe('getTimeUntilReset', () => {
     expect(result).toMatch(/^\d+h \d+m$/);
   });
 
-  it('returns non-negative values', () => {
+  it('returns a human-readable string', () => {
     const result = getTimeUntilReset('monthly', 1);
-    const [hours] = result.split('h ').map(Number);
-    expect(hours).toBeGreaterThanOrEqual(0);
+    // Should return "X days", "Xh Xm", or "Xm"
+    expect(result).toMatch(/\d+\s*(days?|h\s+\d+m|m)/);
   });
 });
 

@@ -19,7 +19,6 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
   const [notes, setNotes] = useState('');
   const [receiptUrl, setReceiptUrl] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [showExtra, setShowExtra] = useState(false);
   const [userPickedCategory, setUserPickedCategory] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -33,7 +32,6 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
       setDescription(editExpense.description);
       setNotes(editExpense.notes ?? '');
       setReceiptUrl(editExpense.receiptUrl ?? '');
-      setShowExtra(!!(editExpense.notes || editExpense.receiptUrl));
     } else {
       resetForm();
     }
@@ -62,7 +60,6 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
     setDescription('');
     setNotes('');
     setReceiptUrl('');
-    setShowExtra(false);
     setUploading(false);
     setUserPickedCategory(false);
     setSuggestedCategory(null);
@@ -124,38 +121,54 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
           {isEdit ? 'Edit Expense' : 'Add Expense'}
         </h2>
 
-        {/* Amount input */}
+        {/* Amount input + Camera */}
         <div className="bg-surface rounded-xl p-6 mb-6">
-          <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-3">Amount</label>
-          <div className="flex items-baseline gap-1">
-            <span className="font-headline text-on-primary-fixed font-bold text-3xl">₪</span>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              placeholder="0"
-              autoFocus
-              className="font-headline text-on-primary-fixed font-extrabold text-5xl bg-transparent border-none outline-none w-full placeholder:text-outline-variant"
-            />
+          <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-3">Amount</label>
+          <div className="flex items-center gap-3">
+            <div className="flex items-baseline gap-1 flex-grow">
+              <span className="font-headline text-on-primary-fixed font-bold text-3xl">₪</span>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                placeholder="0"
+                autoFocus
+                className="font-headline text-on-primary-fixed font-extrabold text-5xl bg-transparent border-none outline-none w-full placeholder:text-outline-variant"
+              />
+            </div>
+            {/* One-tap receipt camera */}
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="flex-shrink-0 w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-tertiary-container active:scale-95 transition-all"
+            >
+              {uploading ? (
+                <span className="material-symbols-outlined animate-spin">progress_activity</span>
+              ) : receiptUrl ? (
+                <span className="material-symbols-outlined filled text-on-tertiary-container">photo_camera</span>
+              ) : (
+                <span className="material-symbols-outlined">photo_camera</span>
+              )}
+            </button>
           </div>
         </div>
 
         {/* Category grid */}
-        <label className="text-on-surface-variant text-xs font-semibold uppercase tracking-widest block mb-3">Category</label>
+        <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-3">Category</label>
         <div className="grid grid-cols-4 gap-2 mb-6">
           {getCategories().map(cat => (
             <button
               key={cat.key}
               onClick={() => { setCategory(cat.key); setUserPickedCategory(true) }}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
+              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${
                 category === cat.key ? 'bg-primary-container' : 'bg-surface hover:bg-surface-container'
               }`}
             >
               <span className="material-symbols-outlined" style={{ color: category === cat.key ? '#fff' : cat.color }}>
                 {cat.icon}
               </span>
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${category === cat.key ? 'text-white' : 'text-on-surface-variant'}`}>
+              <span className={`text-[10px] font-bold tracking-wide ${category === cat.key ? 'text-white' : 'text-on-surface-variant'}`}>
                 {cat.label}
               </span>
             </button>
@@ -178,74 +191,45 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
         )}
         {!suggestedCategory && <div className="mb-3" />}
 
-        {/* Notes & Receipt toggle */}
-        <button
-          onClick={() => setShowExtra(!showExtra)}
-          className="flex items-center gap-2 text-on-surface-variant text-sm font-semibold mb-4 hover:text-on-primary-fixed transition-colors"
-        >
-          <span className="material-symbols-outlined text-lg">{showExtra ? 'expand_less' : 'expand_more'}</span>
-          Notes & Receipt
-          {(notes || receiptUrl) && <span className="w-2 h-2 rounded-full bg-on-tertiary-container" />}
-        </button>
+        {/* Hidden file input for receipt */}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={e => {
+            const file = e.target.files?.[0];
+            if (file) handleUploadReceipt(file);
+          }}
+        />
 
-        {showExtra && (
-          <div className="space-y-4 mb-4">
-            {/* Notes */}
-            <textarea
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="Add notes..."
-              rows={3}
-              className="w-full bg-surface rounded-xl px-4 py-3 font-body text-on-surface border-none outline-none placeholder:text-outline-variant resize-none"
-            />
-
-            {/* Receipt */}
-            <div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={e => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUploadReceipt(file);
-                }}
-              />
-              {receiptUrl ? (
-                <div className="relative">
-                  <img src={receiptUrl} alt="Receipt" className="w-full h-32 object-cover rounded-xl" />
-                  <button
-                    onClick={() => setReceiptUrl('')}
-                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white"
-                  >
-                    <span className="material-symbols-outlined text-sm">close</span>
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => fileRef.current?.click()}
-                  disabled={uploading}
-                  className="w-full py-3 bg-surface rounded-xl flex items-center justify-center gap-2 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
-                >
-                  {uploading ? (
-                    <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
-                  ) : (
-                    <>
-                      <span className="material-symbols-outlined text-lg">photo_camera</span>
-                      <span className="text-sm font-semibold">Add receipt photo</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
+        {/* Receipt preview (if attached) */}
+        {receiptUrl && (
+          <div className="relative mb-4">
+            <img src={receiptUrl} alt="Receipt" className="w-full h-32 object-cover rounded-xl" />
+            <button
+              onClick={() => setReceiptUrl('')}
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white active:scale-95 transition-transform"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
           </div>
         )}
+
+        {/* Notes — always visible */}
+        <textarea
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          placeholder="Add a note (optional)"
+          rows={2}
+          className="w-full bg-surface rounded-xl px-4 py-3 font-body text-sm text-on-surface border-none outline-none placeholder:text-outline-variant resize-none mb-4"
+        />
 
         {/* Submit */}
         <button
           onClick={handleSubmit}
           disabled={!amount || parseFloat(amount) <= 0}
-          className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined filled">{isEdit ? 'check_circle' : 'add_circle'}</span>
           {isEdit ? 'Save Changes' : 'Save Expense'}
