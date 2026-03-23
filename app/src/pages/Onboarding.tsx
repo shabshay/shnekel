@@ -181,13 +181,13 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               {/* Budget input */}
               <div className="bg-surface-container-lowest rounded-xl p-8 mb-6">
                 <div className="flex items-baseline justify-center">
-                  <span className="font-headline text-on-primary-fixed font-bold text-4xl mr-1">₪</span>
+                  <span className="font-headline text-on-primary-fixed font-bold text-3xl mr-1">₪</span>
                   <input
                     type="number"
                     inputMode="decimal"
                     value={budget}
                     onChange={e => setBudget(e.target.value)}
-                    className="font-headline text-on-primary-fixed font-extrabold text-6xl bg-transparent border-none outline-none text-center w-40 placeholder:text-outline-variant"
+                    className="font-headline text-on-primary-fixed font-extrabold text-5xl bg-transparent border-none outline-none text-center w-52 placeholder:text-outline-variant"
                     placeholder="0"
                     autoFocus
                   />
