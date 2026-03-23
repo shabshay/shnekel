@@ -8,6 +8,7 @@ const leftNav = [
 
 const rightNav = [
   { to: '/reports', icon: 'monitoring', label: 'Reports' },
+  { to: '/import', icon: 'upload_file', label: 'Import' },
 ];
 
 export function Layout() {
