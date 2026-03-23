@@ -99,7 +99,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       {showSettings && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowSettings(false)} />
-          <div className="relative bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-8 pb-10 z-10 max-h-[85vh] overflow-y-auto animate-slide-up">
+          <div className="relative bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-8 pb-28 z-10 max-h-[85vh] overflow-y-auto animate-slide-up">
             <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
             <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">Settings</h2>
 

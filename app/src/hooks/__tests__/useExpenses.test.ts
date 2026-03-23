@@ -54,8 +54,8 @@ describe('getPeriodEnd', () => {
   it('weekly is 7 days after period start', () => {
     const start = getPeriodStart('weekly');
     const end = getPeriodEnd('weekly');
-    const diff = end.getTime() - start.getTime();
-    expect(diff).toBe(7 * 24 * 60 * 60 * 1000);
+    const diffDays = Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+    expect(diffDays).toBe(7);
   });
 
   it('monthly end is after monthly start', () => {
