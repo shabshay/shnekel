@@ -30,7 +30,8 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
     settings.period,
     settings.budgetAmount,
     settings.monthStartDay,
-    periodOffset
+    periodOffset,
+    settings.dateMode ?? 'transaction'
   );
   const isCurrentPeriod = periodOffset === 0;
   const { signOut, user } = useAuth();
@@ -164,6 +165,26 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                   }}
                   className="w-full bg-surface rounded-xl px-4 py-3 font-headline font-bold text-on-primary-fixed border-none outline-none"
                 />
+              </div>
+
+              {/* Date mode toggle */}
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant block mb-2">Calculate by</label>
+                <div className="flex gap-2">
+                  {([['transaction', 'Transaction date'], ['billing', 'Billing date']] as const).map(([key, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => onUpdateSettings({ dateMode: key })}
+                      className={`flex-1 py-2.5 rounded-lg font-headline text-sm font-semibold transition-all ${
+                        (settings.dateMode ?? 'transaction') === key
+                          ? 'bg-primary-container text-white'
+                          : 'bg-surface text-on-surface-variant hover:bg-surface-container'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Dark mode toggle */}

@@ -53,6 +53,7 @@ async function processOp(op: SyncOp): Promise<boolean> {
           budget_amount: s.budgetAmount,
           month_start_day: s.monthStartDay,
           onboarding_complete: s.onboardingComplete,
+          date_mode: s.dateMode ?? 'transaction',
           updated_at: new Date().toISOString(),
         });
         if (error) throw error;
@@ -68,6 +69,7 @@ async function processOp(op: SyncOp): Promise<boolean> {
           category: e.category,
           description: e.description,
           date: e.date,
+          billing_date: e.billingDate ?? null,
         });
         if (error) throw error;
         return true;
@@ -89,6 +91,7 @@ async function processOp(op: SyncOp): Promise<boolean> {
           category: e.category,
           description: e.description,
           date: e.date,
+          billing_date: e.billingDate ?? null,
         }));
         // Chunk into batches of 500
         for (let i = 0; i < rows.length; i += 500) {
@@ -166,6 +169,7 @@ export async function pullFromSupabase(): Promise<boolean> {
         monthStartDay: Number(remoteSettings.month_start_day),
         alertThreshold: Number(remoteSettings.alert_threshold ?? 80),
         darkMode: remoteSettings.dark_mode ?? false,
+        dateMode: remoteSettings.date_mode ?? 'transaction',
         onboardingComplete: remoteSettings.onboarding_complete,
       };
       localStorage.setItem('shnekel_settings', JSON.stringify(settings));
@@ -194,6 +198,7 @@ export async function pullFromSupabase(): Promise<boolean> {
           category: e.category,
           description: e.description,
           date: e.date,
+          ...(e.billing_date && { billingDate: e.billing_date }),
         })),
         ...localOnly,
       ];

@@ -2,6 +2,14 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Expense, Category, Period } from '../types';
 import { getExpenses, addExpense as addExpenseToStorage, addExpensesBatch as addExpensesBatchToStorage, updateExpense as updateExpenseInStorage, deleteExpense as deleteExpenseFromStorage } from '../lib/storage';
 
+export type DateMode = 'transaction' | 'billing';
+
+/** Get the effective date for an expense based on the dateMode setting */
+export function getExpenseDate(e: Expense, dateMode: DateMode = 'transaction'): string {
+  if (dateMode === 'billing' && e.billingDate) return e.billingDate;
+  return e.date;
+}
+
 export function getPeriodStart(period: Period, monthStartDay: number = 1): Date {
   const now = new Date();
   switch (period) {
@@ -87,7 +95,7 @@ export function getTimeUntilReset(period: Period, monthStartDay: number = 1): st
 /**
  * @param periodOffset - 0 = current period, -1 = previous period, -2 = two periods ago, etc.
  */
-export function useExpenses(period: Period, budgetAmount: number, monthStartDay: number = 1, periodOffset: number = 0) {
+export function useExpenses(period: Period, budgetAmount: number, monthStartDay: number = 1, periodOffset: number = 0, dateMode: DateMode = 'transaction') {
   const [expenses, setExpenses] = useState<Expense[]>(getExpenses);
 
   // Re-read from localStorage when a sync pull completes
@@ -139,10 +147,10 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
 
   const currentPeriodExpenses = useMemo(() => {
     return expenses.filter(e => {
-      const d = new Date(e.date);
+      const d = new Date(getExpenseDate(e, dateMode));
       return d >= periodStart && d < periodEnd;
     });
-  }, [expenses, periodStart, periodEnd]);
+  }, [expenses, periodStart, periodEnd, dateMode]);
 
   const totalSpent = useMemo(() => {
     return currentPeriodExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -164,17 +172,35 @@ export function useExpenses(period: Period, budgetAmount: number, monthStartDay:
   };
 }
 
-export function getExpenseStats(expenses: Expense[], filterPeriod: 'today' | 'week' | 'month', monthStartDay: number = 1) {
+export type StatsFilterPeriod = 'today' | 'week' | 'month' | 'custom';
+
+interface StatsOptions {
+  monthStartDay?: number;
+  dateMode?: DateMode;
+  customStart?: Date;
+  customEnd?: Date;
+}
+
+export function getExpenseStats(
+  expenses: Expense[],
+  filterPeriod: StatsFilterPeriod,
+  opts: StatsOptions = {}
+) {
+  const { monthStartDay = 1, dateMode = 'transaction', customStart, customEnd } = opts;
   const now = new Date();
   let start: Date;
+  let end: Date;
+
   switch (filterPeriod) {
     case 'today':
       start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      end = now;
       break;
     case 'week': {
       const day = now.getDay();
       const diff = day === 0 ? 6 : day - 1;
       start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diff);
+      end = now;
       break;
     }
     case 'month': {
@@ -183,21 +209,30 @@ export function getExpenseStats(expenses: Expense[], filterPeriod: 'today' | 'we
       } else {
         start = new Date(now.getFullYear(), now.getMonth() - 1, monthStartDay);
       }
+      end = now;
+      break;
+    }
+    case 'custom': {
+      start = customStart ?? new Date(now.getFullYear(), now.getMonth(), 1);
+      end = customEnd ?? now;
       break;
     }
   }
 
-  const filtered = expenses.filter(e => new Date(e.date) >= start);
+  const filtered = expenses.filter(e => {
+    const d = new Date(getExpenseDate(e, dateMode));
+    return d >= start && d <= end;
+  });
   const totalSpent = filtered.reduce((sum, e) => sum + e.amount, 0);
 
   // Days in period
-  const daysDiff = Math.max(1, Math.ceil((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+  const daysDiff = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
   const avgPerDay = totalSpent / daysDiff;
 
   // Highest day
   const byDay = new Map<string, number>();
   filtered.forEach(e => {
-    const dayKey = new Date(e.date).toLocaleDateString();
+    const dayKey = new Date(getExpenseDate(e, dateMode)).toLocaleDateString();
     byDay.set(dayKey, (byDay.get(dayKey) || 0) + e.amount);
   });
   const highestDay = Math.max(0, ...byDay.values());
@@ -219,7 +254,7 @@ export function getExpenseStats(expenses: Expense[], filterPeriod: 'today' | 'we
   // Daily spending data for chart
   const chartData: { date: string; amount: number }[] = [];
   const cursor = new Date(start);
-  while (cursor <= now) {
+  while (cursor <= end) {
     const key = cursor.toLocaleDateString();
     chartData.push({ date: formatChartDate(cursor), amount: byDay.get(key) || 0 });
     cursor.setDate(cursor.getDate() + 1);

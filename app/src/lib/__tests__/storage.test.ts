@@ -111,10 +111,11 @@ describe('Expenses CRUD', () => {
 });
 
 describe('Categories', () => {
-  it('returns 7 default categories when no custom ones', () => {
+  it('returns 8 default categories when no custom ones', () => {
     const cats = getCategories();
-    expect(cats.length).toBe(7);
+    expect(cats.length).toBe(8);
     expect(cats.map(c => c.key)).toContain('food');
+    expect(cats.map(c => c.key)).toContain('groceries');
     expect(cats.map(c => c.key)).toContain('other');
   });
 
@@ -124,11 +125,12 @@ describe('Categories', () => {
       budgetAmount: 200,
       monthStartDay: 1,
       alertThreshold: 80,
+      darkMode: false,
       onboardingComplete: true,
       customCategories: [{ key: 'kids', label: 'Kids', icon: 'child_care', color: '#FF4081' }],
     });
     const cats = getCategories();
-    expect(cats.length).toBe(8);
+    expect(cats.length).toBe(9);
     expect(cats.map(c => c.key)).toContain('kids');
   });
 });

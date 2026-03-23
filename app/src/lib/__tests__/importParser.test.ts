@@ -39,7 +39,7 @@ describe('parseImportFile', () => {
     const result = await parseImportFile(file);
 
     expect(result.rows).toHaveLength(1);
-    expect(result.rows[0].category).toBe('food');
+    expect(result.rows[0].category).toBe('groceries');
   });
 
   it('maps unknown categories to other', async () => {

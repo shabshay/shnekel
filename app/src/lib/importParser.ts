@@ -1,8 +1,10 @@
 import * as XLSX from 'xlsx';
 import type { Category } from '../types';
+import { autoCategorize } from './autoCategorize';
 
 export interface ImportedRow {
-  date: string;       // ISO string
+  date: string;       // ISO string — transaction date
+  billingDate?: string; // ISO string — credit card charge date
   description: string;
   amount: number;
   category: Category;
@@ -14,7 +16,8 @@ export type DetectedFormat = 'isracard' | 'normalized' | 'unknown';
 // Map common Hebrew/English category names → our app categories
 const CATEGORY_MAP: Record<string, Category> = {
   // English
-  'groceries': 'food',
+  'groceries': 'groceries',
+  'supermarket': 'groceries',
   'food': 'food',
   'food & restaurants': 'food',
   'restaurants': 'food',
@@ -43,6 +46,8 @@ const CATEGORY_MAP: Record<string, Category> = {
   // Hebrew
   'מזון': 'food',
   'מסעדות': 'food',
+  'סופרמרקט': 'groceries',
+  'מכולת': 'groceries',
   'תחבורה': 'transport',
   'דלק': 'transport',
   'קניות': 'shopping',
@@ -146,10 +151,17 @@ function parseIsracard(sheet: XLSX.WorkSheet): ImportedRow[] {
   const results: ImportedRow[] = [];
 
   let inDataSection = false;
+  let currentBillingDate: string | null = null;
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i] as unknown[];
     const rowText = normalizeSpaces(row.map(c => String(c ?? '')).join(' '));
+
+    // Extract billing date from section header: "חיוב בתאריך DD/MM/YYYY"
+    const billingMatch = rowText.match(/חיוב\s*בתאריך\s*(\d{1,2}[/.-]\d{1,2}[/.-]\d{4})/);
+    if (billingMatch) {
+      currentBillingDate = parseDate(billingMatch[1]);
+    }
 
     // Detect column header row → start of data section
     if (rowText.includes('תאריך עסקה') && rowText.includes('שם העסק')) {
@@ -177,9 +189,10 @@ function parseIsracard(sheet: XLSX.WorkSheet): ImportedRow[] {
       if (date && amount !== null && amount > 0 && desc) {
         results.push({
           date,
+          billingDate: currentBillingDate ?? undefined,
           description: desc,
           amount,
-          category: 'other',
+          category: autoCategorize(desc) ?? 'other',
           originalCategory: '',
         });
       }
@@ -285,7 +298,7 @@ export function downloadTemplate() {
   const wb = XLSX.utils.book_new();
   const data = [
     ['date', 'description', 'amount', 'category'],
-    ['2025-01-15', 'Supermarket', 150, 'food'],
+    ['2025-01-15', 'Supermarket', 150, 'groceries'],
     ['2025-01-15', 'Bus pass', 50, 'transport'],
     ['2025-01-16', 'New shoes', 200, 'shopping'],
     ['2025-01-16', 'Netflix', 45, 'entertainment'],

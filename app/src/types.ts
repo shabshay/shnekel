@@ -17,6 +17,7 @@ export interface Settings {
   monthStartDay: number; // 1-28, which day of the month the budget resets
   alertThreshold: number; // 0-100, percentage to trigger budget warning (default 80)
   darkMode: boolean;
+  dateMode?: 'transaction' | 'billing'; // which date to use for budget calculations (default: transaction)
   onboardingComplete: boolean;
   customCategories?: CategoryInfo[];
 }
@@ -26,7 +27,8 @@ export interface Expense {
   amount: number;
   category: Category;
   description: string;
-  date: string; // ISO string
+  date: string; // ISO string — transaction date
+  billingDate?: string; // ISO string — credit card charge date
   notes?: string;
   receiptUrl?: string;
 }
@@ -48,6 +50,7 @@ export interface RecurringExpense {
 
 export const DEFAULT_CATEGORIES: CategoryInfo[] = [
   { key: 'food', label: 'Food', icon: 'restaurant', color: '#FF6B35', isDefault: true },
+  { key: 'groceries', label: 'Groceries', icon: 'local_grocery_store', color: '#4CAF50', isDefault: true },
   { key: 'transport', label: 'Transport', icon: 'directions_car', color: '#4E7CFF', isDefault: true },
   { key: 'shopping', label: 'Shopping', icon: 'shopping_bag', color: '#E040FB', isDefault: true },
   { key: 'entertainment', label: 'Fun', icon: 'sports_esports', color: '#FFD600', isDefault: true },
@@ -60,7 +63,7 @@ export const DEFAULT_CATEGORIES: CategoryInfo[] = [
 export const CATEGORIES = DEFAULT_CATEGORIES;
 
 export const AVAILABLE_ICONS = [
-  'restaurant', 'directions_car', 'shopping_bag', 'sports_esports', 'receipt_long',
+  'restaurant', 'local_grocery_store', 'directions_car', 'shopping_bag', 'sports_esports', 'receipt_long',
   'favorite', 'more_horiz', 'child_care', 'pets', 'home', 'school', 'flight',
   'local_cafe', 'fitness_center', 'music_note', 'phone_iphone', 'checkroom',
   'savings', 'redeem', 'local_gas_station', 'build', 'park',

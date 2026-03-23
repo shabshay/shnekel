@@ -69,6 +69,7 @@ export function Import() {
         category,
         description: row.description,
         date: row.date,
+        ...(row.billingDate && { billingDate: row.billingDate }),
       });
     }
     addExpensesBatch(expenses);

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { Category, Expense } from '../types';
 import { getCategories } from '../lib/storage';
 import { supabase } from '../lib/supabase';
+import { autoCategorize } from '../lib/autoCategorize';
 
 interface AddExpenseModalProps {
   open: boolean;
@@ -19,6 +20,8 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
   const [receiptUrl, setReceiptUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [showExtra, setShowExtra] = useState(false);
+  const [userPickedCategory, setUserPickedCategory] = useState(false);
+  const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const isEdit = !!editExpense;
@@ -36,6 +39,21 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
     }
   }, [editExpense]);
 
+  // Auto-categorize based on description
+  useEffect(() => {
+    if (isEdit || userPickedCategory || !description.trim()) {
+      setSuggestedCategory(null);
+      return;
+    }
+    const match = autoCategorize(description);
+    if (match) {
+      setCategory(match);
+      setSuggestedCategory(getCategories().find(c => c.key === match)?.label ?? match);
+    } else {
+      setSuggestedCategory(null);
+    }
+  }, [description, isEdit, userPickedCategory]);
+
   if (!open) return null;
 
   function resetForm() {
@@ -46,6 +64,8 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
     setReceiptUrl('');
     setShowExtra(false);
     setUploading(false);
+    setUserPickedCategory(false);
+    setSuggestedCategory(null);
   }
 
   const handleUploadReceipt = async (file: File) => {
@@ -127,7 +147,7 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
           {getCategories().map(cat => (
             <button
               key={cat.key}
-              onClick={() => setCategory(cat.key)}
+              onClick={() => { setCategory(cat.key); setUserPickedCategory(true) }}
               className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
                 category === cat.key ? 'bg-primary-container' : 'bg-surface hover:bg-surface-container'
               }`}
@@ -148,8 +168,15 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
           value={description}
           onChange={e => setDescription(e.target.value)}
           placeholder="Description (optional)"
-          className="w-full bg-surface rounded-xl px-4 py-3 font-body text-on-surface border-none outline-none placeholder:text-outline-variant mb-4"
+          className="w-full bg-surface rounded-xl px-4 py-3 font-body text-on-surface border-none outline-none placeholder:text-outline-variant mb-1"
         />
+        {suggestedCategory && !userPickedCategory && (
+          <p className="text-on-tertiary-container text-xs font-semibold mb-3 ml-1 flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">auto_awesome</span>
+            Suggested: {suggestedCategory}
+          </p>
+        )}
+        {!suggestedCategory && <div className="mb-3" />}
 
         {/* Notes & Receipt toggle */}
         <button
