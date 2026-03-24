@@ -12,6 +12,7 @@ import { resetAllData } from '../lib/storage';
 import { getCategories } from '../lib/storage';
 import { CategoryBreakdown } from '../components/CategoryBreakdown';
 import { CoinLogo } from '../components/CoinLogo';
+import { isAdminEmail } from '../lib/admin';
 
 interface DashboardProps {
   settings: Settings;
@@ -216,6 +217,15 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                   <span className="material-symbols-outlined text-lg">upload_file</span>
                   <span className="font-semibold text-sm">Import expenses from file</span>
                 </button>
+                {isAdminEmail(user?.email) && (
+                  <button
+                    onClick={() => { setShowSettings(false); navigate('/admin'); }}
+                    className="w-full flex items-center gap-3 py-3 text-on-tertiary-container hover:opacity-80 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
+                    <span className="font-semibold text-sm">Admin panel</span>
+                  </button>
+                )}
               </div>
 
               {/* Account */}

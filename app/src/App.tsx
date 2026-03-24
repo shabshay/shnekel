@@ -9,6 +9,7 @@ import { Reports } from './pages/Reports';
 import { Import } from './pages/Import';
 import { Recurring } from './pages/Recurring';
 import { Categories } from './pages/Categories';
+import { Admin } from './pages/Admin';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { useState, useEffect } from 'react';
 import { useExpenses } from './hooks/useExpenses';
@@ -70,6 +71,7 @@ function AuthenticatedApp() {
           <Route path="/import" element={<Import />} />
           <Route path="/recurring" element={<Recurring />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
