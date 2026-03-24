@@ -32,6 +32,10 @@ jobs:
         run: npm ci
         working-directory: app
 
+      - name: Security audit
+        run: npm audit --audit-level=critical
+        working-directory: app
+
       - name: Run tests
         run: npm test
         working-directory: app

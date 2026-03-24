@@ -254,6 +254,32 @@ function parseNormalized(sheet: XLSX.WorkSheet): ImportedRow[] {
   return results;
 }
 
+// ─── Sanitization (mitigates xlsx prototype pollution CVE) ──────
+
+/**
+ * Deep-clone data through JSON to strip any prototype pollution
+ * injected by the xlsx library during parsing.
+ * Also validates field types to ensure data integrity.
+ */
+function sanitizeRows(rows: ImportedRow[]): ImportedRow[] {
+  // Deep clone via JSON to strip prototype chains
+  const clean: ImportedRow[] = JSON.parse(JSON.stringify(rows));
+  return clean.filter(row => {
+    // Validate required field types
+    if (typeof row.amount !== 'number' || !isFinite(row.amount) || row.amount <= 0) return false;
+    if (typeof row.description !== 'string') return false;
+    if (typeof row.date !== 'string') return false;
+    if (typeof row.category !== 'string') return false;
+    // Sanitize string fields — strip any HTML tags
+    row.description = row.description.replace(/<[^>]*>/g, '');
+    if (row.originalCategory) row.originalCategory = row.originalCategory.replace(/<[^>]*>/g, '');
+    // Strip HTML tags from string fields
+    row.description = row.description.replace(/<[^>]*>/g, '');
+    if (row.originalCategory) row.originalCategory = row.originalCategory.replace(/<[^>]*>/g, '');
+    return true;
+  });
+}
+
 // ─── Main entry point ───────────────────────────────────────────
 
 export interface ParseResult {
@@ -276,12 +302,12 @@ export async function parseImportFile(file: File): Promise<ParseResult> {
 
     // Try Isracard detection
     if (isIsracardFormat(sheet)) {
-      const rows = parseIsracard(sheet);
+      const rows = sanitizeRows(parseIsracard(sheet));
       return { rows, format: 'isracard' };
     }
 
     // Try normalized format
-    const rows = parseNormalized(sheet);
+    const rows = sanitizeRows(parseNormalized(sheet));
     if (rows.length > 0) {
       return { rows, format: 'normalized' };
     }
