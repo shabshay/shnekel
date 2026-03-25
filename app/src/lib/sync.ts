@@ -55,6 +55,7 @@ async function processOp(op: SyncOp): Promise<boolean> {
           alert_threshold: s.alertThreshold ?? 80,
           dark_mode: s.darkMode ?? false,
           date_mode: s.dateMode ?? 'transaction',
+          category_budgets: JSON.stringify(s.categoryBudgets ?? {}),
           onboarding_complete: s.onboardingComplete,
           updated_at: new Date().toISOString(),
         });
@@ -172,6 +173,9 @@ export async function pullFromSupabase(): Promise<boolean> {
         alertThreshold: Number(remoteSettings.alert_threshold ?? 80),
         darkMode: remoteSettings.dark_mode ?? false,
         dateMode: remoteSettings.date_mode ?? 'transaction',
+        categoryBudgets: typeof remoteSettings.category_budgets === 'string'
+          ? JSON.parse(remoteSettings.category_budgets)
+          : (remoteSettings.category_budgets ?? {}),
         onboardingComplete: remoteSettings.onboarding_complete,
       };
       localStorage.setItem('shnekel_settings', JSON.stringify(settings));

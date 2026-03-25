@@ -42,6 +42,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [search, setSearch] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
   const navigate = useNavigate();
 
   const filteredExpenses = useMemo(() => {
@@ -201,6 +202,55 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                 </button>
               </div>
 
+              {/* Category budgets */}
+              <div className="pt-2 border-t border-outline-variant/20">
+                <button
+                  onClick={() => setShowCategoryBudgets(!showCategoryBudgets)}
+                  className="w-full flex items-center justify-between py-2"
+                >
+                  <label className="text-xs font-semibold tracking-wide text-on-surface-variant">Category budgets</label>
+                  <span className={`material-symbols-outlined text-on-surface-variant text-lg transition-transform ${showCategoryBudgets ? 'rotate-180' : ''}`}>
+                    expand_more
+                  </span>
+                </button>
+                {showCategoryBudgets && (
+                  <div className="space-y-2 pb-2">
+                    <p className="text-on-surface-variant text-xs mb-2">Set optional limits per category. Leave empty for no limit.</p>
+                    {getCategories().map(cat => (
+                      <div key={cat.key} className="flex items-center gap-2">
+                        <div
+                          className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: cat.color + '20' }}
+                        >
+                          <span className="material-symbols-outlined text-sm" style={{ color: cat.color }}>{cat.icon}</span>
+                        </div>
+                        <span className="text-on-primary-fixed text-xs font-semibold w-20 truncate">{cat.label}</span>
+                        <div className="flex-grow relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs">₪</span>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            placeholder="—"
+                            value={settings.categoryBudgets?.[cat.key] || ''}
+                            onChange={e => {
+                              const v = parseFloat(e.target.value);
+                              const updated = { ...(settings.categoryBudgets ?? {}) };
+                              if (isNaN(v) || v <= 0) {
+                                delete updated[cat.key];
+                              } else {
+                                updated[cat.key] = v;
+                              }
+                              onUpdateSettings({ categoryBudgets: updated });
+                            }}
+                            className="w-full bg-surface rounded-lg pl-6 pr-2 py-1.5 text-xs font-headline font-bold text-on-primary-fixed border-none outline-none placeholder:text-outline-variant"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Quick links */}
               <div className="space-y-1 pt-2 border-t border-outline-variant/20">
                 <button
@@ -277,7 +327,26 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       </div>
 
       {/* Budget Alert */}
-      {isCurrentPeriod && <BudgetAlert progress={progress} remaining={remaining} threshold={settings.alertThreshold ?? 80} />}
+      {isCurrentPeriod && (
+        <BudgetAlert
+          progress={progress}
+          remaining={remaining}
+          threshold={settings.alertThreshold ?? 80}
+          categoryAlerts={
+            settings.categoryBudgets
+              ? Object.entries(settings.categoryBudgets)
+                  .filter(([, b]) => b > 0)
+                  .map(([catKey, catBudget]) => {
+                    const spent = currentPeriodExpenses
+                      .filter(e => e.category === catKey)
+                      .reduce((sum, e) => sum + e.amount, 0);
+                    const label = getCategories().find(c => c.key === catKey)?.label ?? catKey;
+                    return { label, spent, budget: catBudget };
+                  })
+              : undefined
+          }
+        />
+      )}
 
       {/* Gauge */}
       <div className="mb-8">
@@ -294,7 +363,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       {currentPeriodExpenses.length > 0 && (
         <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
           <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Spending by category</h3>
-          <CategoryBreakdown expenses={currentPeriodExpenses} budget={settings.budgetAmount} />
+          <CategoryBreakdown expenses={currentPeriodExpenses} budget={settings.budgetAmount} categoryBudgets={settings.categoryBudgets} />
         </div>
       )}
 

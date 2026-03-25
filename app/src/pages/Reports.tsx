@@ -234,7 +234,11 @@ export function Reports() {
               <div className="space-y-3">
                 {stats.categoryBreakdown.map(cat => {
                   const info = allCategories.find(c => c.key === cat.category);
-                  const pct = stats.totalSpent > 0 ? (cat.total / stats.totalSpent) * 100 : 0;
+                  const catBudget = settings.categoryBudgets?.[cat.category];
+                  const hasCatBudget = catBudget != null && catBudget > 0;
+                  const isOver = hasCatBudget && cat.total > catBudget;
+                  const barBase = hasCatBudget ? catBudget : stats.totalSpent;
+                  const pct = barBase > 0 ? Math.min((cat.total / barBase) * 100, 100) : 0;
                   return (
                     <div key={cat.category}>
                       <div className="flex items-center gap-3 mb-1.5">
@@ -242,18 +246,25 @@ export function Reports() {
                         <div className="flex-grow min-w-0">
                           <div className="flex items-center justify-between">
                             <span className="font-semibold text-on-primary-fixed text-sm">{info?.label ?? cat.category}</span>
-                            <span className="font-headline font-bold text-on-primary-fixed text-sm">{formatCurrency(cat.total)}</span>
+                            <span className={`font-headline font-bold text-sm ${isOver ? 'text-error' : 'text-on-primary-fixed'}`}>
+                              {formatCurrency(cat.total)}
+                              {hasCatBudget && <span className="text-on-surface-variant font-normal"> / {formatCurrency(catBudget)}</span>}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-on-surface-variant text-xs">{cat.count} expense{cat.count !== 1 ? 's' : ''}</span>
-                            <span className="text-on-surface-variant text-xs">{Math.round(pct)}%</span>
+                            {isOver ? (
+                              <span className="text-error text-xs font-semibold">over budget</span>
+                            ) : (
+                              <span className="text-on-surface-variant text-xs">{Math.round(pct)}%</span>
+                            )}
                           </div>
                         </div>
                       </div>
                       <div className="h-1.5 bg-surface-container rounded-full overflow-hidden ml-13">
                         <div
                           className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${pct}%`, backgroundColor: info?.color ?? '#78909C' }}
+                          style={{ width: `${pct}%`, backgroundColor: isOver ? 'var(--color-error)' : (info?.color ?? '#78909C') }}
                         />
                       </div>
                     </div>

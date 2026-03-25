@@ -18,6 +18,7 @@ export interface Settings {
   alertThreshold: number; // 0-100, percentage to trigger budget warning (default 80)
   darkMode: boolean;
   dateMode?: 'transaction' | 'billing'; // which date to use for budget calculations (default: transaction)
+  categoryBudgets?: Record<string, number>; // per-category budget limits, e.g. { "groceries": 3000 }
   onboardingComplete: boolean;
   customCategories?: CategoryInfo[];
 }
