@@ -43,6 +43,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   const [search, setSearch] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
   const navigate = useNavigate();
 
   const filteredExpenses = useMemo(() => {
@@ -59,6 +60,9 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       );
     });
   }, [currentPeriodExpenses, search]);
+
+  // Reset pagination when period or search changes
+  useEffect(() => { setVisibleCount(20); }, [periodOffset, search]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -411,10 +415,24 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
       {/* Expense list */}
       <div>
-        <h3 className="font-headline font-bold text-lg text-on-primary-fixed mb-4">
-          {search ? 'Search results' : 'Recent expenses'}
-        </h3>
-        <ExpenseList expenses={filteredExpenses} onDelete={removeExpense} onEdit={handleEdit} />
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-headline font-bold text-lg text-on-primary-fixed">
+            {search ? 'Search results' : 'Recent expenses'}
+          </h3>
+          {filteredExpenses.length > 0 && (
+            <span className="text-on-surface-variant text-xs">{filteredExpenses.length} total</span>
+          )}
+        </div>
+        <ExpenseList expenses={filteredExpenses.slice(0, visibleCount)} onDelete={removeExpense} onEdit={handleEdit} />
+        {filteredExpenses.length > visibleCount && (
+          <button
+            onClick={() => setVisibleCount(v => v + 20)}
+            className="w-full py-3 mt-3 bg-surface-container-lowest rounded-xl font-headline font-semibold text-sm text-on-surface-variant hover:text-on-primary-fixed transition-colors flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined text-lg">expand_more</span>
+            Show more ({filteredExpenses.length - visibleCount} remaining)
+          </button>
+        )}
       </div>
 
       {/* Add modal */}
