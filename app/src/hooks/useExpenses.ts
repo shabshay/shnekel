@@ -265,7 +265,32 @@ export function getExpenseStats(
     cursor.setDate(cursor.getDate() + 1);
   }
 
-  return { totalSpent, avgPerDay, highestDay, topCategory, chartData, filteredExpenses: filtered };
+  // Category breakdown (sorted by amount desc)
+  const categoryBreakdown = [...byCat.entries()]
+    .map(([cat, total]) => ({ category: cat, total, count: filtered.filter(e => e.category === cat).length }))
+    .sort((a, b) => b.total - a.total);
+
+  // Top expenses (sorted by amount desc)
+  const topExpenses = [...filtered]
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 10);
+
+  // Expense count
+  const expenseCount = filtered.length;
+
+  // Recurring vs one-time split
+  const recurringTotal = filtered
+    .filter(e => e.description.includes('(recurring)'))
+    .reduce((sum, e) => sum + e.amount, 0);
+  const oneTimeTotal = totalSpent - recurringTotal;
+
+  return {
+    totalSpent, avgPerDay, highestDay, topCategory, chartData,
+    filteredExpenses: filtered,
+    categoryBreakdown, topExpenses, expenseCount,
+    recurringTotal, oneTimeTotal,
+    periodStart: start, periodEnd: end, daysDiff,
+  };
 }
 
 function formatChartDate(d: Date): string {
