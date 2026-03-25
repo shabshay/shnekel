@@ -90,11 +90,18 @@ function parseDate(value: unknown): string | null {
 
   // String date
   if (typeof value === 'string') {
-    // Try DD/MM/YYYY
+    // Try DD/MM/YYYY (4-digit year)
     const ddmmyyyy = value.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/);
     if (ddmmyyyy) {
       const [, d, m, y] = ddmmyyyy;
       return new Date(+y, +m - 1, +d).toISOString();
+    }
+    // Try DD/MM/YY (2-digit year, e.g. "12.03.26" → 2026)
+    const ddmmyy = value.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2})$/);
+    if (ddmmyy) {
+      const [, d, m, yy] = ddmmyy;
+      const year = +yy + (+yy >= 50 ? 1900 : 2000); // 50-99 → 19xx, 00-49 → 20xx
+      return new Date(year, +m - 1, +d).toISOString();
     }
     // Try YYYY-MM-DD
     const iso = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -119,69 +126,101 @@ function parseAmount(value: unknown): number | null {
   return null;
 }
 
-// ─── Isracard .xls parser ───────────────────────────────────────
+// ─── Isracard parser (supports old .xls and new .xlsx formats) ──
 
 function normalizeSpaces(s: string): string {
   return s.replace(/\s+/g, ' ').trim();
 }
 
+// Detect either old or new Isracard format
 function isIsracardFormat(sheet: XLSX.WorkSheet): boolean {
-  // Isracard files have card sections with headers like "כרטיס:" or
-  // column headers "תאריך עסקה" + "שם העסק" + "סכום חיוב" in specific layout.
-  // They also have multiple card sections and offset columns (col B onwards).
-  // Note: Isracard sometimes uses double spaces e.g. "שם  העסק"
   const range = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: '' });
 
-  for (let i = 0; i < Math.min(10, range.length); i++) {
+  for (let i = 0; i < Math.min(15, range.length); i++) {
     const row = range[i];
     const text = normalizeSpaces(row.join(' '));
-    if (text.includes('תאריך עסקה') && text.includes('שם העסק')) {
-      return true;
-    }
-    // Also detect by Isracard card header pattern
-    if (text.includes('ישראכרט') || text.includes('כרטיס:')) {
-      return true;
-    }
+    // Old format: "תאריך עסקה" + "שם העסק"
+    if (text.includes('תאריך עסקה') && text.includes('שם העסק')) return true;
+    // New format: "תאריך רכישה" + "שם בית עסק"
+    if (text.includes('תאריך רכישה') && text.includes('שם בית עסק')) return true;
+    // Generic Isracard markers
+    if (text.includes('ישראכרט') || text.includes('מסטרקארד')) return true;
+    if (text.includes('כרטיס:') || /- \d{4}$/.test(text.trim())) return true;
+    // New format header: "פירוט עסקאות"
+    if (text.includes('פירוט עסקאות')) return true;
   }
   return false;
 }
 
+type IsracardVariant = 'old' | 'new';
+
+/**
+ * Detect which Isracard format variant this is:
+ * - 'old': .xls with "תאריך עסקה" headers, data in columns B-F (index 1-5)
+ * - 'new': .xlsx with "תאריך רכישה" headers, data in columns A-H (index 0-7)
+ */
+function detectIsracardVariant(rows: unknown[][]): IsracardVariant {
+  for (let i = 0; i < Math.min(15, rows.length); i++) {
+    const text = normalizeSpaces((rows[i] as unknown[]).map(c => String(c ?? '')).join(' '));
+    if (text.includes('תאריך רכישה')) return 'new';
+    if (text.includes('תאריך עסקה')) return 'old';
+  }
+  return 'old'; // fallback
+}
+
 function parseIsracard(sheet: XLSX.WorkSheet): ImportedRow[] {
   const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: true });
+  const variant = detectIsracardVariant(rows);
   const results: ImportedRow[] = [];
 
   let inDataSection = false;
   let currentBillingDate: string | null = null;
 
+  // Header patterns for each variant
+  const headerDateCol = variant === 'new' ? 'תאריך רכישה' : 'תאריך עסקה';
+  const headerBizCol = variant === 'new' ? 'שם בית עסק' : 'שם העסק';
+
+  // Column indices differ between variants
+  // Old: A=empty, B=date(1), C=business(2), D=txn amount(3), E=charge amount(4), F=details(5)
+  // New: A=date(0), B=business(1), C=txn amount(2), D=currency(3), E=charge amount(4), F=currency(5), G=voucher(6), H=details(7)
+  const dateIdx = variant === 'new' ? 0 : 1;
+  const descIdx = variant === 'new' ? 1 : 2;
+  const chargeIdx = 4; // same in both
+
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i] as unknown[];
     const rowText = normalizeSpaces(row.map(c => String(c ?? '')).join(' '));
 
-    // Extract billing date from section header: "חיוב בתאריך DD/MM/YYYY"
-    const billingMatch = rowText.match(/חיוב\s*בתאריך\s*(\d{1,2}[/.-]\d{1,2}[/.-]\d{4})/);
-    if (billingMatch) {
-      currentBillingDate = parseDate(billingMatch[1]);
+    // Extract billing date from section header
+    // Old format: "חיוב בתאריך DD/MM/YYYY"
+    const billingMatch1 = rowText.match(/חיוב\s*בתאריך\s*(\d{1,2}[/.-]\d{1,2}[/.-]\d{4})/);
+    if (billingMatch1) {
+      currentBillingDate = parseDate(billingMatch1[1]);
+    }
+    // New format: "לחיוב ב-DD.MM" (no year, current year assumed)
+    const billingMatch2 = rowText.match(/לחיוב\s*ב-?(\d{1,2})\.(\d{1,2})/);
+    if (billingMatch2 && !currentBillingDate) {
+      const now = new Date();
+      currentBillingDate = new Date(now.getFullYear(), parseInt(billingMatch2[2]) - 1, parseInt(billingMatch2[1])).toISOString();
     }
 
     // Detect column header row → start of data section
-    if (rowText.includes('תאריך עסקה') && rowText.includes('שם העסק')) {
+    if (rowText.includes(headerDateCol) && rowText.includes(headerBizCol)) {
       inDataSection = true;
       continue;
     }
 
-    // Detect end of section (subtotal row or empty)
+    // Detect end of section
     if (inDataSection) {
       const rowStr = row.map(c => String(c ?? '')).join('').trim();
-      if (rowStr === '' || rowStr.includes('סה"כ') || rowStr.includes('מספר כרטיס')) {
+      if (rowStr === '' || rowStr.includes('סה"כ') || rowStr.includes('מספר כרטיס') || rowStr.includes('תנאים משפטיים')) {
         inDataSection = false;
         continue;
       }
 
-      // Isracard uses columns B-F (index 1-5), with A often empty
-      // B=date, C=business, D=transaction amount, E=charge amount, F=details
-      const dateVal = row[1];
-      const desc = String(row[2] ?? '').trim();
-      const chargeAmount = row[4]; // סכום חיוב - what was actually charged
+      const dateVal = row[dateIdx];
+      const desc = String(row[descIdx] ?? '').trim();
+      const chargeAmount = row[chargeIdx];
 
       const date = parseDate(dateVal);
       const amount = parseAmount(chargeAmount);
