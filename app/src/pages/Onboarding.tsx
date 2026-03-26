@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import type { Period } from '../types';
 import { CoinLogo } from '../components/CoinLogo';
+import { useLocale } from '../hooks/useLocale'
 
 interface OnboardingProps {
   onComplete: (period: Period, budget: number, monthStartDay?: number) => void;
 }
 
-const periodOptions: { key: Period; label: string; desc: string; icon: string }[] = [
-  { key: 'daily', label: 'Daily', desc: 'Reset every day', icon: 'calendar_today' },
-  { key: 'weekly', label: 'Weekly', desc: 'Reset every week', icon: 'date_range' },
-  { key: 'monthly', label: 'Monthly', desc: 'Reset every month', icon: 'calendar_month' },
+const periodOptions: { key: Period; labelKey: string; descKey: string; icon: string }[] = [
+  { key: 'daily', labelKey: 'period.daily', descKey: 'period.dailyDesc', icon: 'calendar_today' },
+  { key: 'weekly', labelKey: 'period.weekly', descKey: 'period.weeklyDesc', icon: 'date_range' },
+  { key: 'monthly', labelKey: 'period.monthly', descKey: 'period.monthlyDesc', icon: 'calendar_month' },
 ];
 
 const presetsByPeriod: Record<Period, number[]> = {
@@ -23,6 +24,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const [period, setPeriod] = useState<Period>('daily');
   const [budget, setBudget] = useState('100');
   const [monthStartDay, setMonthStartDay] = useState(1);
+  const { t } = useLocale()
 
   const totalSteps = period === 'monthly' ? 3 : 2;
 
@@ -47,10 +49,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         <div className="flex items-center gap-2">
           <CoinLogo size="sm" />
           <h1 className="font-headline font-black text-primary-container text-2xl tracking-tight">
-            Shnekel
+            {t('app.name')}
           </h1>
         </div>
-        <span className="text-on-surface-variant font-medium text-sm">Step {step} of {totalSteps}</span>
+        <span className="text-on-surface-variant font-medium text-sm">{t('onboarding.step', { step, total: totalSteps })}</span>
       </header>
 
       {/* Progress dots */}
@@ -66,10 +68,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           {step === 1 && (
             <>
               <h2 className="font-headline font-bold text-3xl text-on-primary-fixed tracking-tight mb-2">
-                Choose your period
+                {t('onboarding.choosePeriod')}
               </h2>
               <p className="text-on-surface-variant text-base mb-8">
-                How often should your budget reset?
+                {t('onboarding.choosePeriodDesc')}
               </p>
 
               <div className="space-y-3">
@@ -96,9 +98,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                       </span>
                     </div>
                     <div className="text-left">
-                      <h3 className="font-headline font-semibold text-lg">{opt.label}</h3>
+                      <h3 className="font-headline font-semibold text-lg">{t(opt.labelKey)}</h3>
                       <p className={`text-sm ${period === opt.key ? 'text-white/70' : 'text-on-surface-variant'}`}>
-                        {opt.desc}
+                        {t(opt.descKey)}
                       </p>
                     </div>
                     {period === opt.key && (
@@ -112,7 +114,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 onClick={handleContinueStep1}
                 className="w-full mt-10 py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10"
               >
-                Continue
+                {t('onboarding.continue')}
               </button>
             </>
           )}
@@ -121,10 +123,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           {step === 2 && period === 'monthly' && (
             <>
               <h2 className="font-headline font-bold text-3xl text-on-primary-fixed tracking-tight mb-2">
-                When does your month start?
+                {t('onboarding.monthStart')}
               </h2>
               <p className="text-on-surface-variant text-base mb-8">
-                Pick the day your budget resets each month (e.g. salary day).
+                {t('onboarding.monthStartDesc')}
               </p>
 
               {/* Day grid */}
@@ -147,7 +149,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <div className="bg-surface-container-lowest rounded-xl p-4 mb-8 flex items-center gap-3">
                 <span className="material-symbols-outlined text-on-tertiary-container">info</span>
                 <p className="text-on-surface-variant text-sm">
-                  Your budget will reset on the <span className="font-semibold text-on-primary-fixed">{monthStartDay}{getOrdinal(monthStartDay)}</span> of each month.
+                  {t('onboarding.monthResetInfo', { day: monthStartDay, ordinal: getOrdinal(monthStartDay) })}
                 </p>
               </div>
 
@@ -156,13 +158,13 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   onClick={() => setStep(1)}
                   className="font-headline font-semibold text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
-                  Back
+                  {t('onboarding.back')}
                 </button>
                 <button
                   onClick={getNextStepFromMonthDay}
                   className="flex-1 py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10"
                 >
-                  Continue
+                  {t('onboarding.continue')}
                 </button>
               </div>
             </>
@@ -172,10 +174,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           {step === getBudgetStep() && !(step === 2 && period === 'monthly') && (
             <>
               <h2 className="font-headline font-bold text-3xl text-on-primary-fixed tracking-tight mb-2">
-                Set your budget
+                {t('onboarding.setBudget')}
               </h2>
               <p className="text-on-surface-variant text-base mb-8">
-                How much can you spend per {period === 'daily' ? 'day' : period === 'weekly' ? 'week' : 'month'}?
+                {t(period === 'daily' ? 'onboarding.budgetPerDay' : period === 'weekly' ? 'onboarding.budgetPerWeek' : 'onboarding.budgetPerMonth')}
               </p>
 
               {/* Budget input */}
@@ -217,7 +219,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   onClick={() => setStep(step - 1)}
                   className="font-headline font-semibold text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
-                  Back
+                  {t('onboarding.back')}
                 </button>
                 <button
                   onClick={() => {
@@ -227,7 +229,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   disabled={!budget || parseFloat(budget) <= 0}
                   className="flex-1 py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40"
                 >
-                  Get Started
+                  {t('onboarding.getStarted')}
                 </button>
               </div>
             </>

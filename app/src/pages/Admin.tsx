@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAdmin } from '../hooks/useAdmin'
+import { useLocale } from '../hooks/useLocale'
 import { formatCurrency } from '../lib/format'
 import { getCategories } from '../lib/storage'
 import { CategoryIcon } from '../components/CategoryIcon'
@@ -9,6 +10,7 @@ import { useEffect } from 'react'
 
 export function Admin() {
   const navigate = useNavigate()
+  const { t } = useLocale()
   const { isAdmin, loading, error, stats, users, categories, dailyVolume, refresh } = useAdmin()
 
   // Redirect non-admin
@@ -47,8 +49,8 @@ export function Admin() {
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
-            <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Admin</h1>
-            <p className="text-on-surface-variant text-xs">System overview</p>
+            <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">{t('admin.title')}</h1>
+            <p className="text-on-surface-variant text-xs">{t('admin.systemOverview')}</p>
           </div>
         </div>
         <button
@@ -69,12 +71,12 @@ export function Admin() {
       {/* Overview Cards */}
       {stats && (
         <div className="grid grid-cols-2 gap-3 mb-8">
-          <StatCard icon="group" label="Total users" value={String(stats.total_users)} />
-          <StatCard icon="trending_up" label="Active this week" value={String(stats.active_this_week)} accent />
-          <StatCard icon="receipt_long" label="Total expenses" value={stats.total_expenses.toLocaleString()} />
-          <StatCard icon="payments" label="Total tracked" value={formatCurrency(stats.total_amount)} accent />
+          <StatCard icon="group" label={t('admin.totalUsers')} value={String(stats.total_users)} />
+          <StatCard icon="trending_up" label={t('admin.activeThisWeek')} value={String(stats.active_this_week)} accent />
+          <StatCard icon="receipt_long" label={t('admin.totalExpenses')} value={stats.total_expenses.toLocaleString()} />
+          <StatCard icon="payments" label={t('admin.totalTracked')} value={formatCurrency(stats.total_amount)} accent />
           {stats.incomplete_onboarding > 0 && (
-            <StatCard icon="warning" label="Incomplete onboarding" value={String(stats.incomplete_onboarding)} />
+            <StatCard icon="warning" label={t('admin.incompleteOnboarding')} value={String(stats.incomplete_onboarding)} />
           )}
         </div>
       )}
@@ -83,7 +85,7 @@ export function Admin() {
       {chartData.length > 0 && (
         <div className="bg-surface-container-lowest rounded-2xl p-5 mb-8">
           <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">
-            Daily volume (last 30 days)
+            {t('admin.dailyVolume')}
           </h3>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={chartData}>
@@ -121,7 +123,7 @@ export function Admin() {
       {categories.length > 0 && (
         <div className="bg-surface-container-lowest rounded-2xl p-5 mb-8">
           <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">
-            Categories (all users)
+            {t('admin.categoriesAllUsers')}
           </h3>
           <div className="space-y-3">
             {categories.map(cat => {
@@ -149,7 +151,7 @@ export function Admin() {
       {users.length > 0 && (
         <div className="bg-surface-container-lowest rounded-2xl p-5">
           <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">
-            Users ({users.length})
+            {t('admin.users', { count: users.length })}
           </h3>
           <div className="space-y-3">
             {users.map(u => (
@@ -158,22 +160,22 @@ export function Admin() {
                   <div className="min-w-0">
                     <p className="font-semibold text-on-primary-fixed text-sm truncate">{u.email}</p>
                     <p className="text-on-surface-variant text-xs">
-                      Joined {new Date(u.signed_up).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {t('admin.joined', { date: new Date(u.signed_up).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' }) })}
                       {u.last_sign_in && (
-                        <> · Last seen {timeAgo(u.last_sign_in)}</>
+                        <> · {t('admin.lastSeen', { time: timeAgo(u.last_sign_in, t) })}</>
                       )}
                     </p>
                   </div>
                   {!u.onboarding_complete && (
                     <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
-                      No onboarding
+                      {t('admin.noOnboarding')}
                     </span>
                   )}
                 </div>
                 <div className="flex gap-4 text-xs text-on-surface-variant">
-                  <span>{u.expense_count} expenses</span>
-                  <span>{formatCurrency(u.total_spent)} spent</span>
-                  <span>Budget: {formatCurrency(u.budget_amount)}/{u.period}</span>
+                  <span>{t('admin.expenseCount', { count: u.expense_count })}</span>
+                  <span>{t('admin.amountSpent', { amount: formatCurrency(u.total_spent) })}</span>
+                  <span>{t('admin.budgetInfo', { amount: formatCurrency(u.budget_amount), period: u.period })}</span>
                 </div>
               </div>
             ))}
@@ -200,15 +202,15 @@ function StatCard({ icon, label, value, accent }: { icon: string; label: string;
   )
 }
 
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: (key: string, params?: Record<string, string | number>) => string): string {
   const d = new Date(dateStr)
   const now = new Date()
   const diffMs = now.getTime() - d.getTime()
   const hours = Math.floor(diffMs / (1000 * 60 * 60))
-  if (hours < 1) return 'just now'
-  if (hours < 24) return `${hours}h ago`
+  if (hours < 1) return t('time.justNow')
+  if (hours < 24) return t('time.hoursAgo', { h: hours })
   const days = Math.floor(hours / 24)
-  if (days < 7) return `${days}d ago`
-  if (days < 30) return `${Math.floor(days / 7)}w ago`
-  return `${Math.floor(days / 30)}mo ago`
+  if (days < 7) return t('time.daysAgo', { d: days })
+  if (days < 30) return t('time.weeksAgo', { w: Math.floor(days / 7) })
+  return t('time.monthsAgo', { m: Math.floor(days / 30) })
 }

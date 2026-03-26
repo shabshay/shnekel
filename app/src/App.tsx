@@ -17,6 +17,7 @@ import { pullFromSupabase, migrateLocalToSupabase } from './lib/sync';
 import { processRecurringExpenses } from './lib/storage';
 import type { Category } from './types';
 import { CoinLogo } from './components/CoinLogo';
+import { LocaleProvider } from './hooks/useLocale';
 
 function AddExpensePage({ settings }: { settings: ReturnType<typeof useSettings>['settings'] }) {
   const { addExpense } = useExpenses(settings.period, settings.budgetAmount, settings.monthStartDay);
@@ -102,4 +103,12 @@ function App() {
   return <AuthenticatedApp />;
 }
 
-export default App;
+function AppWithProviders() {
+  return (
+    <LocaleProvider>
+      <App />
+    </LocaleProvider>
+  );
+}
+
+export default AppWithProviders;

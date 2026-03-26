@@ -5,17 +5,19 @@ import { addExpensesBatch } from '../lib/storage';
 import { type Category, type Expense } from '../types';
 import { getCategories } from '../lib/storage';
 import { formatCurrency } from '../lib/format';
+import { useLocale } from '../hooks/useLocale';
 
 type Step = 'upload' | 'preview' | 'done';
 
-const FORMAT_LABELS: Record<DetectedFormat, string> = {
-  isracard: 'Isracard credit card statement',
-  normalized: 'Standard spreadsheet',
-  unknown: 'Unknown',
-};
-
 export function Import() {
   const navigate = useNavigate();
+  const { t } = useLocale();
+
+  const FORMAT_LABELS: Record<DetectedFormat, string> = {
+    isracard: t('import.isracardFormat'),
+    normalized: t('import.normalizedFormat'),
+    unknown: 'Unknown',
+  };
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>('upload');
@@ -41,7 +43,7 @@ export function Import() {
     }
 
     if (result.rows.length === 0) {
-      setError('No expenses found in this file. Make sure it has dates and amounts.');
+      setError(t('import.noExpensesFound'));
       return;
     }
 
@@ -111,11 +113,11 @@ export function Import() {
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div>
-          <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Import Expenses</h1>
+          <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">{t('import.title')}</h1>
           <p className="text-on-surface-variant text-sm">
-            {step === 'upload' && 'Upload a file to get started'}
-            {step === 'preview' && 'Review before importing'}
-            {step === 'done' && 'All done!'}
+            {step === 'upload' && t('import.uploadHint')}
+            {step === 'preview' && t('import.reviewHint')}
+            {step === 'done' && t('import.doneHint')}
           </p>
         </div>
       </div>
@@ -146,12 +148,12 @@ export function Import() {
               <>
                 <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-3">upload_file</span>
                 <p className="font-headline font-semibold text-on-primary-fixed text-center">
-                  Tap to choose a file
+                  {t('import.tapToChoose')}
                 </p>
                 <p className="text-on-surface-variant text-sm text-center mt-1">
-                  or drag & drop here
+                  {t('import.orDragDrop')}
                 </p>
-                <p className="text-outline text-xs mt-3">.xlsx, .xls, or .csv</p>
+                <p className="text-outline text-xs mt-3">{t('import.fileTypes')}</p>
               </>
             )}
           </div>
@@ -166,16 +168,16 @@ export function Import() {
           {/* Supported formats */}
           <div className="bg-surface-container-lowest rounded-2xl p-6 mb-6">
             <h3 className="font-headline font-bold text-base text-on-primary-fixed mb-4">
-              Supported formats
+              {t('import.supportedFormats')}
             </h3>
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-on-tertiary-container mt-0.5">credit_card</span>
                 <div>
-                  <p className="font-semibold text-on-primary-fixed text-sm">Isracard statement</p>
+                  <p className="font-semibold text-on-primary-fixed text-sm">{t('import.isracardTitle')}</p>
                   <p className="text-on-surface-variant text-xs">
-                    The .xls file you download from your Isracard account. We'll auto-detect the format and extract all transactions.
+                    {t('import.isracardDesc')}
                   </p>
                 </div>
               </div>
@@ -183,9 +185,9 @@ export function Import() {
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-on-tertiary-container mt-0.5">table_chart</span>
                 <div>
-                  <p className="font-semibold text-on-primary-fixed text-sm">Any spreadsheet</p>
+                  <p className="font-semibold text-on-primary-fixed text-sm">{t('import.spreadsheetTitle')}</p>
                   <p className="text-on-surface-variant text-xs">
-                    An .xlsx or .csv with columns for date, description, amount, and optionally category.
+                    {t('import.spreadsheetDesc')}
                   </p>
                 </div>
               </div>
@@ -195,17 +197,17 @@ export function Import() {
           {/* Template download */}
           <div className="bg-surface-container-lowest rounded-2xl p-6">
             <h3 className="font-headline font-bold text-base text-on-primary-fixed mb-2">
-              Not sure about the format?
+              {t('import.notSureFormat')}
             </h3>
             <p className="text-on-surface-variant text-sm mb-4">
-              Download our template to see an example. Fill it with your expenses and import it back.
+              {t('import.templateHint')}
             </p>
             <button
               onClick={downloadTemplate}
               className="flex items-center gap-2 py-3 px-5 bg-primary-container text-on-primary font-headline font-semibold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-lg">download</span>
-              Download template
+              {t('import.downloadTemplate')}
             </button>
           </div>
         </>
@@ -220,20 +222,20 @@ export function Import() {
               {format === 'isracard' ? 'credit_card' : 'table_chart'}
             </span>
             <span className="text-on-surface-variant text-sm">
-              Detected: <span className="font-semibold text-on-primary-fixed">{FORMAT_LABELS[format]}</span>
+              {t('import.detected')} <span className="font-semibold text-on-primary-fixed">{FORMAT_LABELS[format]}</span>
             </span>
           </div>
 
           {/* Summary bar */}
           <div className="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between mb-4">
             <div>
-              <p className="text-on-surface-variant text-xs">Selected</p>
+              <p className="text-on-surface-variant text-xs">{t('import.selected')}</p>
               <p className="font-headline font-bold text-on-primary-fixed">
                 {selectedRows.size} of {rows.length} expenses
               </p>
             </div>
             <div className="text-right">
-              <p className="text-on-surface-variant text-xs">Total</p>
+              <p className="text-on-surface-variant text-xs">{t('import.totalLabel')}</p>
               <p className="font-headline font-bold text-on-primary-fixed">{formatCurrency(totalSelected)}</p>
             </div>
           </div>
@@ -246,7 +248,7 @@ export function Import() {
             <span className="material-symbols-outlined text-lg">
               {selectedRows.size === rows.length ? 'check_box' : selectedRows.size > 0 ? 'indeterminate_check_box' : 'check_box_outline_blank'}
             </span>
-            {selectedRows.size === rows.length ? 'Deselect all' : 'Select all'}
+            {selectedRows.size === rows.length ? t('import.deselectAll') : t('import.selectAll')}
           </button>
 
           {/* Row list */}
@@ -314,7 +316,7 @@ export function Import() {
               className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-base rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40"
             >
               <span className="material-symbols-outlined filled">download_done</span>
-              Import {selectedRows.size} expense{selectedRows.size !== 1 ? 's' : ''}
+              {t('import.importCount', { count: selectedRows.size })}
             </button>
           </div>
         </>
@@ -327,23 +329,23 @@ export function Import() {
             <span className="material-symbols-outlined filled text-on-tertiary-container text-4xl">check_circle</span>
           </div>
           <h2 className="font-headline font-bold text-2xl text-on-primary-fixed mb-2">
-            {importedCount} expense{importedCount !== 1 ? 's' : ''} imported
+            {t('import.importedCount', { count: importedCount })}
           </h2>
           <p className="text-on-surface-variant text-center mb-10">
-            Your expenses have been added to Shnekel. They'll show up in your balance and reports.
+            {t('import.importedMsg')}
           </p>
           <button
             onClick={() => navigate('/')}
             className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-base rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10"
           >
             <span className="material-symbols-outlined">home</span>
-            Back to dashboard
+            {t('import.backToDashboard')}
           </button>
           <button
             onClick={() => { setStep('upload'); setRows([]); setError(''); }}
             className="mt-4 font-headline font-semibold text-on-surface-variant hover:text-on-primary-fixed transition-colors"
           >
-            Import another file
+            {t('import.importAnother')}
           </button>
         </div>
       )}

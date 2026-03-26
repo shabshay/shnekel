@@ -1,75 +1,77 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { CategoryInfo } from '../types';
-import { AVAILABLE_ICONS, AVAILABLE_COLORS } from '../types';
-import { getCategories, getSettings, saveSettings } from '../lib/storage';
-import { ConfirmDialog } from '../components/ConfirmDialog';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import type { CategoryInfo } from '../types'
+import { AVAILABLE_ICONS, AVAILABLE_COLORS } from '../types'
+import { getCategories, getSettings, saveSettings } from '../lib/storage'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { useLocale } from '../hooks/useLocale'
 
 export function Categories() {
-  const navigate = useNavigate();
-  const [categories, setCategories] = useState<CategoryInfo[]>(getCategories);
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<CategoryInfo | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<CategoryInfo | null>(null);
+  const navigate = useNavigate()
+  const { t } = useLocale()
+  const [categories, setCategories] = useState<CategoryInfo[]>(getCategories)
+  const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<CategoryInfo | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<CategoryInfo | null>(null)
 
   // Form state
-  const [label, setLabel] = useState('');
-  const [icon, setIcon] = useState('more_horiz');
-  const [color, setColor] = useState('#78909C');
+  const [label, setLabel] = useState('')
+  const [icon, setIcon] = useState('more_horiz')
+  const [color, setColor] = useState('#78909C')
 
-  const customCategories = categories.filter(c => !c.isDefault);
+  const customCategories = categories.filter(c => !c.isDefault)
 
   const openForm = (cat?: CategoryInfo) => {
     if (cat) {
-      setEditing(cat);
-      setLabel(cat.label);
-      setIcon(cat.icon);
-      setColor(cat.color);
+      setEditing(cat)
+      setLabel(cat.label)
+      setIcon(cat.icon)
+      setColor(cat.color)
     } else {
-      setEditing(null);
-      setLabel('');
-      setIcon('more_horiz');
-      setColor('#78909C');
+      setEditing(null)
+      setLabel('')
+      setIcon('more_horiz')
+      setColor('#78909C')
     }
-    setShowForm(true);
-  };
+    setShowForm(true)
+  }
 
   const closeForm = () => {
-    setShowForm(false);
-    setEditing(null);
-  };
+    setShowForm(false)
+    setEditing(null)
+  }
 
   const saveCustomCategories = (customs: CategoryInfo[]) => {
-    const settings = getSettings();
-    saveSettings({ ...settings, customCategories: customs });
-    setCategories(getCategories());
-  };
+    const settings = getSettings()
+    saveSettings({ ...settings, customCategories: customs })
+    setCategories(getCategories())
+  }
 
   const handleSave = () => {
-    if (!label.trim()) return;
-    const key = editing?.key ?? label.trim().toLowerCase().replace(/\s+/g, '_');
+    if (!label.trim()) return
+    const key = editing?.key ?? label.trim().toLowerCase().replace(/\s+/g, '_')
 
     if (editing) {
       const updated = customCategories.map(c =>
         c.key === editing.key ? { ...c, key, label: label.trim(), icon, color } : c
-      );
-      saveCustomCategories(updated);
+      )
+      saveCustomCategories(updated)
     } else {
       // Check for duplicate key
       if (categories.some(c => c.key === key)) {
-        return; // silently prevent duplicate
+        return // silently prevent duplicate
       }
-      saveCustomCategories([...customCategories, { key, label: label.trim(), icon, color }]);
+      saveCustomCategories([...customCategories, { key, label: label.trim(), icon, color }])
     }
-    closeForm();
-  };
+    closeForm()
+  }
 
   const handleDelete = () => {
     if (deleteTarget) {
-      saveCustomCategories(customCategories.filter(c => c.key !== deleteTarget.key));
-      setDeleteTarget(null);
+      saveCustomCategories(customCategories.filter(c => c.key !== deleteTarget.key))
+      setDeleteTarget(null)
     }
-  };
+  }
 
   return (
     <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
@@ -83,8 +85,8 @@ export function Categories() {
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
-            <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Categories</h1>
-            <p className="text-on-surface-variant text-sm">Manage expense categories</p>
+            <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">{t('categories.title')}</h1>
+            <p className="text-on-surface-variant text-sm">{t('categories.subtitle')}</p>
           </div>
         </div>
         <button
@@ -96,7 +98,7 @@ export function Categories() {
       </div>
 
       {/* Default categories */}
-      <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Default</h3>
+      <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('categories.default')}</h3>
       <div className="space-y-2 mb-8">
         {categories.filter(c => c.isDefault).map(cat => (
           <div key={cat.key} className="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 opacity-70">
@@ -107,23 +109,23 @@ export function Categories() {
               <span className="material-symbols-outlined" style={{ color: cat.color }}>{cat.icon}</span>
             </div>
             <p className="font-headline font-semibold text-on-primary-fixed text-sm flex-grow">{cat.label}</p>
-            <span className="text-outline text-xs">Built-in</span>
+            <span className="text-outline text-xs">{t('categories.builtIn')}</span>
           </div>
         ))}
       </div>
 
       {/* Custom categories */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant">Custom</h3>
+        <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant">{t('categories.custom')}</h3>
       </div>
       {customCategories.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-on-surface-variant text-sm">No custom categories yet</p>
+          <p className="text-on-surface-variant text-sm">{t('categories.noCustom')}</p>
           <button
             onClick={() => openForm()}
             className="mt-3 text-on-tertiary-container font-semibold text-sm hover:underline"
           >
-            Add one
+            {t('categories.addOne')}
           </button>
         </div>
       ) : (
@@ -166,22 +168,22 @@ export function Categories() {
           <div className="relative bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-8 pb-10 z-10 max-h-[85vh] overflow-y-auto">
             <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
             <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">
-              {editing ? 'Edit Category' : 'New Category'}
+              {editing ? t('categories.editCategory') : t('categories.newCategory')}
             </h2>
 
             {/* Name */}
-            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Name</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('categories.name')}</label>
             <input
               type="text"
               value={label}
               onChange={e => setLabel(e.target.value)}
-              placeholder="e.g. Kids, Pets, Car"
+              placeholder={t('categories.namePlaceholder')}
               autoFocus
               className="w-full bg-surface rounded-xl px-4 py-3 font-body text-on-surface border-none outline-none placeholder:text-outline-variant mb-5"
             />
 
             {/* Icon picker */}
-            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Icon</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('categories.icon')}</label>
             <div className="grid grid-cols-7 gap-2 mb-5">
               {AVAILABLE_ICONS.map(ic => (
                 <button
@@ -202,7 +204,7 @@ export function Categories() {
             </div>
 
             {/* Color picker */}
-            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Color</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('categories.color')}</label>
             <div className="grid grid-cols-7 gap-2 mb-6">
               {AVAILABLE_COLORS.map(c => (
                 <button
@@ -233,7 +235,7 @@ export function Categories() {
               className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40"
             >
               <span className="material-symbols-outlined filled">{editing ? 'check_circle' : 'add_circle'}</span>
-              {editing ? 'Save Changes' : 'Add Category'}
+              {editing ? t('expense.saveChanges') : t('categories.addCategory')}
             </button>
           </div>
         </div>
@@ -241,13 +243,13 @@ export function Categories() {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title="Delete category?"
-        message={deleteTarget ? `Remove "${deleteTarget.label}"? Existing expenses with this category will show as "Other".` : ''}
+        title={t('categories.deleteCategory')}
+        message={deleteTarget ? t('categories.deleteCategoryMsg', { label: deleteTarget.label }) : ''}
         confirmLabel="Delete"
         confirmDestructive
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
-  );
+  )
 }

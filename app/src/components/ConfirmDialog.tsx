@@ -1,3 +1,5 @@
+import { useLocale } from '../hooks/useLocale'
+
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
@@ -12,11 +14,12 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Confirm',
+  confirmLabel,
   confirmDestructive = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { t } = useLocale()
   if (!open) return null;
 
   return (
@@ -30,7 +33,7 @@ export function ConfirmDialog({
             onClick={onCancel}
             className="flex-1 py-3 rounded-xl font-headline font-semibold text-sm text-on-surface-variant bg-surface hover:bg-surface-container transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -40,7 +43,7 @@ export function ConfirmDialog({
                 : 'bg-primary-container text-on-primary hover:opacity-90'
             }`}
           >
-            {confirmLabel}
+            {confirmLabel || t('common.confirm')}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatCurrency } from '../lib/format';
+import { useLocale } from '../hooks/useLocale';
 
 interface CategoryAlert {
   label: string;
@@ -15,6 +16,7 @@ interface BudgetAlertProps {
 }
 
 export function BudgetAlert({ progress, remaining, threshold, categoryAlerts }: BudgetAlertProps) {
+  const { t } = useLocale()
   const [dismissed, setDismissed] = useState(false);
   const [catDismissed, setCatDismissed] = useState(false);
 
@@ -38,8 +40,8 @@ export function BudgetAlert({ progress, remaining, threshold, categoryAlerts }: 
           </span>
           <p className={`text-sm font-medium flex-grow ${overBudget ? 'text-error' : 'text-amber-700'}`}>
             {overBudget
-              ? `Over budget by ${formatCurrency(Math.abs(remaining))}`
-              : `${percentUsed}% of budget used`
+              ? t('alert.overBudgetBy', { amount: formatCurrency(Math.abs(remaining)) })
+              : t('alert.budgetUsed', { pct: percentUsed })
             }
           </p>
           <button
@@ -57,8 +59,8 @@ export function BudgetAlert({ progress, remaining, threshold, categoryAlerts }: 
           <span className="material-symbols-outlined text-lg text-error">category</span>
           <p className="text-sm font-medium flex-grow text-error/80">
             {overCategories.length === 1
-              ? `${overCategories[0].label} is over its category budget`
-              : `${overCategories.map(c => c.label).join(', ')} are over their category budgets`
+              ? t('alert.catOverBudget', { label: overCategories[0].label })
+              : t('alert.catsOverBudget', { labels: overCategories.map(c => c.label).join(', ') })
             }
           </p>
           <button

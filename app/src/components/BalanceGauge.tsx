@@ -1,4 +1,5 @@
 import { formatCurrency } from '../lib/format';
+import { useLocale } from '../hooks/useLocale';
 
 interface BalanceGaugeProps {
   remaining: number;
@@ -9,6 +10,7 @@ interface BalanceGaugeProps {
 }
 
 export function BalanceGauge({ remaining, budget, progress, periodLabel, resetTime }: BalanceGaugeProps) {
+  const { t } = useLocale()
   const radius = 130;
   const stroke = 12;
   const normalizedRadius = radius - stroke / 2;
@@ -56,17 +58,17 @@ export function BalanceGauge({ remaining, budget, progress, periodLabel, resetTi
             {formatCurrency(remaining)}
           </span>
           <span className={`font-headline font-semibold text-sm mt-1 ${isOverBudget ? 'text-error' : 'text-on-tertiary-container'}`}>
-            {isOverBudget ? 'over budget' : periodLabel}
+            {isOverBudget ? t('gauge.overBudget') : periodLabel}
           </span>
           {/* Budget context pill */}
           <span className="text-xs text-on-surface-variant bg-surface-container rounded-full px-3 py-1 mt-2">
-            of {formatCurrency(budget)} budget
+            {t('gauge.ofBudget', { amount: formatCurrency(budget) })}
           </span>
         </div>
       </div>
       {resetTime && (
         <p className="text-on-surface-variant text-sm mt-4">
-          Resets in <span className="font-semibold text-on-tertiary-container">{resetTime}</span>
+          {t('gauge.resetsIn')} <span className="font-semibold text-on-tertiary-container">{resetTime}</span>
         </p>
       )}
     </div>

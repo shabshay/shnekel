@@ -4,6 +4,7 @@ import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
 import { act } from 'react'
 import { DEFAULT_CATEGORIES } from '../../types'
+import { LocaleProvider } from '../../hooks/useLocale'
 
 // Mock sync module to prevent Supabase calls
 vi.mock('../../lib/sync', () => ({
@@ -83,7 +84,7 @@ function renderToContainer(component: React.ReactElement) {
   const container = document.createElement('div')
   document.body.appendChild(container)
   act(() => {
-    createRoot(container).render(component)
+    createRoot(container).render(createElement(LocaleProvider, null, component))
   })
   return container
 }

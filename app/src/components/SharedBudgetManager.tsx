@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSharedBudgets } from '../hooks/useSharedBudgets'
 import { useAccountContext } from '../hooks/useAccountContext'
+import { useLocale } from '../hooks/useLocale'
 
 interface SharedBudgetManagerProps {
   open: boolean
@@ -10,6 +11,7 @@ interface SharedBudgetManagerProps {
 export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps) {
   const { invitesSent, invitesReceived, sendInvite, acceptInvite, revokeAccess, leaveShared, loading } = useSharedBudgets()
   const { activeContext, isSharedMode, switchToShared, switchToPersonal } = useAccountContext()
+  const { t } = useLocale()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
@@ -51,21 +53,21 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
         <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
 
         <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">
-          Shared Budget
+          {t('shared.title')}
         </h2>
 
         {/* Active context indicator */}
         {isSharedMode && activeContext.type === 'shared' && (
           <div className="bg-tertiary-container/20 rounded-xl p-4 mb-6 flex items-center justify-between">
             <div>
-              <p className="text-on-primary-fixed text-sm font-semibold">Currently viewing shared budget</p>
+              <p className="text-on-primary-fixed text-sm font-semibold">{t('shared.viewingShared')}</p>
               <p className="text-on-surface-variant text-xs">{activeContext.ownerEmail}</p>
             </div>
             <button
               onClick={handleSwitchToPersonal}
               className="text-xs font-semibold text-on-tertiary-container bg-tertiary-container/30 rounded-lg px-3 py-1.5 hover:bg-tertiary-container/50 transition-colors"
             >
-              Switch to mine
+              {t('shared.switchToMine')}
             </button>
           </div>
         )}
@@ -73,26 +75,26 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
         {/* Accepted shared budgets I can switch to */}
         {acceptedReceived.length > 0 && !isSharedMode && (
           <div className="mb-6">
-            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Shared with you</h3>
+            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('shared.sharedWithYou')}</h3>
             <div className="space-y-2">
               {acceptedReceived.map(invite => (
                 <div key={invite.id} className="bg-surface rounded-xl p-4 flex items-center justify-between">
                   <div>
                     <p className="text-on-primary-fixed text-sm font-semibold">{invite.ownerEmail}</p>
-                    <p className="text-on-surface-variant text-xs">Accepted</p>
+                    <p className="text-on-surface-variant text-xs">{t('shared.accepted')}</p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleSwitchToShared(invite.ownerId, invite.ownerEmail, invite.id)}
                       className="text-xs font-semibold text-on-primary bg-primary-container rounded-lg px-3 py-1.5 hover:opacity-90 transition-colors"
                     >
-                      View budget
+                      {t('shared.viewBudget')}
                     </button>
                     <button
                       onClick={() => leaveShared(invite.id)}
                       className="text-xs font-semibold text-error bg-error/5 rounded-lg px-3 py-1.5 hover:bg-error/10 transition-colors"
                     >
-                      Leave
+                      {t('shared.leave')}
                     </button>
                   </div>
                 </div>
@@ -104,19 +106,19 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
         {/* Accepted sent - people who share my budget */}
         {acceptedSent.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Sharing your budget with</h3>
+            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('shared.sharingWith')}</h3>
             <div className="space-y-2">
               {acceptedSent.map(invite => (
                 <div key={invite.id} className="bg-surface rounded-xl p-4 flex items-center justify-between">
                   <div>
                     <p className="text-on-primary-fixed text-sm font-semibold">{invite.memberEmail}</p>
-                    <p className="text-on-tertiary-container text-xs">Active</p>
+                    <p className="text-on-tertiary-container text-xs">{t('shared.active')}</p>
                   </div>
                   <button
                     onClick={() => revokeAccess(invite.id)}
                     className="text-xs font-semibold text-error bg-error/5 rounded-lg px-3 py-1.5 hover:bg-error/10 transition-colors"
                   >
-                    Revoke
+                    {t('shared.revoke')}
                   </button>
                 </div>
               ))}
@@ -127,19 +129,19 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
         {/* Pending invites received */}
         {pendingReceived.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Pending invitations</h3>
+            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('shared.pendingInvitations')}</h3>
             <div className="space-y-2">
               {pendingReceived.map(invite => (
                 <div key={invite.id} className="bg-surface rounded-xl p-4 flex items-center justify-between">
                   <div>
                     <p className="text-on-primary-fixed text-sm font-semibold">{invite.ownerEmail}</p>
-                    <p className="text-on-surface-variant text-xs">Wants to share their budget with you</p>
+                    <p className="text-on-surface-variant text-xs">{t('shared.wantsToShare')}</p>
                   </div>
                   <button
                     onClick={() => acceptInvite(invite.id)}
                     className="text-xs font-semibold text-on-primary bg-primary-container rounded-lg px-3 py-1.5 hover:opacity-90 transition-colors"
                   >
-                    Accept
+                    {t('shared.accept')}
                   </button>
                 </div>
               ))}
@@ -150,12 +152,12 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
         {/* Pending invites sent */}
         {pendingSent.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Waiting for response</h3>
+            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('shared.waitingResponse')}</h3>
             <div className="space-y-2">
               {pendingSent.map(invite => (
                 <div key={invite.id} className="bg-surface rounded-xl p-4 flex items-center justify-between">
                   <p className="text-on-surface-variant text-sm">{invite.memberEmail}</p>
-                  <span className="text-xs text-outline">Pending</span>
+                  <span className="text-xs text-outline">{t('shared.pending')}</span>
                 </div>
               ))}
             </div>
@@ -164,13 +166,13 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
 
         {/* Send invite */}
         <div className="border-t border-outline-variant/20 pt-5">
-          <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Invite someone</h3>
+          <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('shared.inviteSomeone')}</h3>
           <div className="flex gap-2">
             <input
               type="email"
               value={email}
               onChange={e => { setEmail(e.target.value); setError(''); }}
-              placeholder="partner@email.com"
+              placeholder={t('shared.invitePlaceholder')}
               className="flex-grow bg-surface rounded-xl px-4 py-3 text-sm text-on-primary-fixed border-none outline-none placeholder:text-outline-variant"
               onKeyDown={e => e.key === 'Enter' && handleSendInvite()}
             />
@@ -179,14 +181,14 @@ export function SharedBudgetManager({ open, onClose }: SharedBudgetManagerProps)
               disabled={sending || !email.trim()}
               className="px-4 py-3 bg-primary-container text-on-primary font-semibold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40"
             >
-              {sending ? '...' : 'Invite'}
+              {sending ? '...' : t('shared.invite')}
             </button>
           </div>
           {error && (
             <p className="text-error text-xs mt-2">{error}</p>
           )}
           <p className="text-outline text-xs mt-3">
-            They'll see your invitation next time they open Shnekel.
+            {t('shared.inviteHint')}
           </p>
         </div>
 

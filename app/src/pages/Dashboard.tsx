@@ -15,17 +15,18 @@ import { CoinLogo } from '../components/CoinLogo';
 import { isAdminEmail } from '../lib/admin';
 import { SharedBudgetManager } from '../components/SharedBudgetManager';
 import { useAccountContext } from '../hooks/useAccountContext';
+import { useLocale } from '../hooks/useLocale';
 
 interface DashboardProps {
   settings: Settings;
   onUpdateSettings: (updates: Partial<Settings>) => void;
 }
 
-const periodLabels = {
-  daily: 'left today',
-  weekly: 'left this week',
-  monthly: 'left this month',
-};
+const periodLabelKeys = {
+  daily: 'dashboard.leftToday',
+  weekly: 'dashboard.leftThisWeek',
+  monthly: 'dashboard.leftThisMonth',
+} as const;
 
 export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   const [periodOffset, setPeriodOffset] = useState(0);
@@ -48,6 +49,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   const [visibleCount, setVisibleCount] = useState(20);
   const [showSharedBudgets, setShowSharedBudgets] = useState(false);
   const { activeContext, isSharedMode, switchToPersonal } = useAccountContext();
+  const { locale, setLocale, t } = useLocale();
   const navigate = useNavigate();
 
   const filteredExpenses = useMemo(() => {
@@ -94,8 +96,8 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         <div className="flex items-center gap-3">
           <CoinLogo size="sm" />
           <div>
-            <h1 className="font-headline font-bold text-xl text-on-primary-fixed">Shnekel</h1>
-            <p className="text-on-surface-variant text-xs">Spend like it's cash.</p>
+            <h1 className="font-headline font-bold text-xl text-on-primary-fixed">{t('app.name')}</h1>
+            <p className="text-on-surface-variant text-xs">{t('app.tagline')}</p>
           </div>
         </div>
         <button
@@ -112,11 +114,11 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowSettings(false)} />
           <div className="relative bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-8 pb-8 z-10 max-h-[100dvh] sm:max-h-[90vh] overflow-y-auto animate-slide-up">
             <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
-            <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">Settings</h2>
+            <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">{t('dashboard.settings')}</h2>
 
             <div className="space-y-5">
               <div>
-                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Period</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">{t('dashboard.periodLabel')}</label>
                 <div className="flex gap-2">
                   {(['daily', 'weekly', 'monthly'] as const).map(p => (
                     <button
@@ -128,14 +130,14 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                           : 'bg-surface text-on-surface-variant hover:bg-surface-container'
                       }`}
                     >
-                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                      {t(`period.${p}`)}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Budget (₪)</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">{t('dashboard.budget')}</label>
                 <input
                   type="number"
                   value={settings.budgetAmount}
@@ -149,7 +151,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
               {settings.period === 'monthly' && (
                 <div>
-                  <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Month starts on day</label>
+                  <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">{t('dashboard.monthStartDay')}</label>
                   <select
                     value={settings.monthStartDay}
                     onChange={e => onUpdateSettings({ monthStartDay: parseInt(e.target.value) })}
@@ -163,7 +165,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
               )}
 
               <div>
-                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Alert at (%)</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">{t('dashboard.alertAt')}</label>
                 <input
                   type="number"
                   min="50"
@@ -179,9 +181,9 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
               {/* Date mode toggle */}
               <div>
-                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">Calculate by</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-2">{t('dashboard.calculateBy')}</label>
                 <div className="flex gap-2">
-                  {([['transaction', 'Transaction date'], ['billing', 'Billing date']] as const).map(([key, label]) => (
+                  {([['transaction', t('dashboard.transactionDate')], ['billing', t('dashboard.billingDate')]] as const).map(([key, label]) => (
                     <button
                       key={key}
                       onClick={() => onUpdateSettings({ dateMode: key })}
@@ -199,7 +201,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
 
               {/* Dark mode toggle */}
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold tracking-wide text-on-surface-variant">Dark mode</label>
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant">{t('dashboard.darkMode')}</label>
                 <button
                   onClick={() => onUpdateSettings({ darkMode: !settings.darkMode })}
                   className="text-on-surface-variant hover:text-on-primary-fixed transition-colors"
@@ -210,20 +212,43 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                 </button>
               </div>
 
+              {/* Language toggle */}
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold tracking-wide text-on-surface-variant">{t('dashboard.language')}</label>
+                <div className="flex gap-1 bg-surface rounded-lg p-0.5">
+                  <button
+                    onClick={() => setLocale('en')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                      locale === 'en' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:text-on-primary-fixed'
+                    }`}
+                  >
+                    EN
+                  </button>
+                  <button
+                    onClick={() => setLocale('he')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                      locale === 'he' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:text-on-primary-fixed'
+                    }`}
+                  >
+                    עב
+                  </button>
+                </div>
+              </div>
+
               {/* Category budgets */}
               <div className="pt-2 border-t border-outline-variant/20">
                 <button
                   onClick={() => setShowCategoryBudgets(!showCategoryBudgets)}
                   className="w-full flex items-center justify-between py-2"
                 >
-                  <label className="text-xs font-semibold tracking-wide text-on-surface-variant">Category budgets</label>
+                  <label className="text-xs font-semibold tracking-wide text-on-surface-variant">{t('dashboard.categoryBudgets')}</label>
                   <span className={`material-symbols-outlined text-on-surface-variant text-lg transition-transform ${showCategoryBudgets ? 'rotate-180' : ''}`}>
                     expand_more
                   </span>
                 </button>
                 {showCategoryBudgets && (
                   <div className="space-y-2 pb-2">
-                    <p className="text-on-surface-variant text-xs mb-2">Set optional limits per category. Leave empty for no limit.</p>
+                    <p className="text-on-surface-variant text-xs mb-2">{t('dashboard.categoryBudgetsHint')}</p>
                     {getCategories().map(cat => (
                       <div key={cat.key} className="flex items-center gap-2">
                         <div
@@ -266,21 +291,21 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                   className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
                   <span className="material-symbols-outlined text-lg">group</span>
-                  <span className="font-semibold text-sm">Shared budget</span>
+                  <span className="font-semibold text-sm">{t('dashboard.sharedBudget')}</span>
                 </button>
                 <button
                   onClick={() => { setShowSettings(false); navigate('/categories'); }}
                   className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
                   <span className="material-symbols-outlined text-lg">category</span>
-                  <span className="font-semibold text-sm">Manage categories</span>
+                  <span className="font-semibold text-sm">{t('dashboard.manageCategories')}</span>
                 </button>
                 <button
                   onClick={() => { setShowSettings(false); navigate('/import'); }}
                   className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
                   <span className="material-symbols-outlined text-lg">upload_file</span>
-                  <span className="font-semibold text-sm">Import expenses from file</span>
+                  <span className="font-semibold text-sm">{t('dashboard.importExpenses')}</span>
                 </button>
                 {isAdminEmail(user?.email) && (
                   <button
@@ -288,7 +313,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                     className="w-full flex items-center gap-3 py-3 text-on-tertiary-container hover:opacity-80 transition-colors"
                   >
                     <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
-                    <span className="font-semibold text-sm">Admin panel</span>
+                    <span className="font-semibold text-sm">{t('dashboard.adminPanel')}</span>
                   </button>
                 )}
               </div>
@@ -302,14 +327,14 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-error text-sm font-semibold bg-error/5 hover:bg-error/10 transition-colors"
                   >
                     <span className="material-symbols-outlined text-lg">delete_forever</span>
-                    Reset data
+                    {t('dashboard.resetData')}
                   </button>
                   <button
                     onClick={signOut}
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-on-surface-variant text-sm font-semibold bg-surface hover:bg-surface-container transition-colors"
                   >
                     <span className="material-symbols-outlined text-lg">logout</span>
-                    Sign out
+                    {t('dashboard.signOut')}
                   </button>
                 </div>
               </div>
@@ -324,7 +349,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-on-tertiary-container text-lg">group</span>
             <div>
-              <p className="text-on-primary-fixed text-xs font-semibold">Shared budget</p>
+              <p className="text-on-primary-fixed text-xs font-semibold">{t('dashboard.sharedBudget')}</p>
               <p className="text-on-surface-variant text-[10px]">{activeContext.ownerEmail}</p>
             </div>
           </div>
@@ -332,7 +357,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
             onClick={() => switchToPersonal()}
             className="text-[10px] font-semibold text-on-tertiary-container bg-tertiary-container/20 rounded-lg px-2.5 py-1 hover:bg-tertiary-container/40 transition-colors"
           >
-            My budget
+            {t('dashboard.myBudget')}
           </button>
         </div>
       )}
@@ -388,7 +413,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
           remaining={remaining}
           budget={settings.budgetAmount}
           progress={progress}
-          periodLabel={isCurrentPeriod ? periodLabels[settings.period] : 'spent'}
+          periodLabel={isCurrentPeriod ? t(periodLabelKeys[settings.period]) : t('dashboard.spent')}
           resetTime={isCurrentPeriod ? resetTime : ''}
         />
       </div>
@@ -396,7 +421,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       {/* Category Breakdown */}
       {currentPeriodExpenses.length > 0 && (
         <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
-          <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">Spending by category</h3>
+          <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-3">{t('dashboard.spendingByCategory')}</h3>
           <CategoryBreakdown expenses={currentPeriodExpenses} budget={settings.budgetAmount} categoryBudgets={settings.categoryBudgets} />
         </div>
       )}
@@ -407,19 +432,19 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-base rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10 mb-6"
       >
         <span className="material-symbols-outlined filled">add_circle</span>
-        Add expense
+        {t('dashboard.addExpense')}
       </button>
 
       {/* Tab buttons */}
       <div className="flex gap-3 mb-6">
         <button className="flex-1 py-3 bg-surface-container-lowest rounded-xl font-headline font-semibold text-sm text-on-primary-fixed border-2 border-primary-container/10">
-          All Expenses
+          {t('dashboard.allExpenses')}
         </button>
         <button
           onClick={() => navigate('/reports')}
           className="flex-1 py-3 bg-surface-container-lowest rounded-xl font-headline font-semibold text-sm text-on-surface-variant hover:text-on-primary-fixed transition-colors"
         >
-          Reports
+          {t('dashboard.reports')}
         </button>
       </div>
 
@@ -430,7 +455,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search expenses..."
+          placeholder={t('dashboard.searchExpenses')}
           className="w-full bg-surface-container-lowest rounded-xl pl-10 pr-4 py-3 font-body text-sm text-on-surface border-none outline-none placeholder:text-outline-variant"
         />
         {search && (
@@ -447,10 +472,10 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-headline font-bold text-lg text-on-primary-fixed">
-            {search ? 'Search results' : 'Recent expenses'}
+            {search ? t('dashboard.searchResults') : t('dashboard.recentExpenses')}
           </h3>
           {filteredExpenses.length > 0 && (
-            <span className="text-on-surface-variant text-xs">{filteredExpenses.length} total</span>
+            <span className="text-on-surface-variant text-xs">{t('dashboard.total', { count: filteredExpenses.length })}</span>
           )}
         </div>
         <ExpenseList expenses={filteredExpenses.slice(0, visibleCount)} onDelete={removeExpense} onEdit={handleEdit} />
@@ -460,7 +485,7 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
             className="w-full py-3 mt-3 bg-surface-container-lowest rounded-xl font-headline font-semibold text-sm text-on-surface-variant hover:text-on-primary-fixed transition-colors flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-lg">expand_more</span>
-            Show more ({filteredExpenses.length - visibleCount} remaining)
+            {t('dashboard.showMore', { count: filteredExpenses.length - visibleCount })}
           </button>
         )}
       </div>
@@ -483,9 +508,9 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
       {/* Reset confirm */}
       <ConfirmDialog
         open={showResetConfirm}
-        title="Reset all data?"
-        message="This will permanently delete all your expenses, recurring items, categories, and settings. You'll start fresh as if you just signed up. This cannot be undone."
-        confirmLabel="Delete everything"
+        title={t('dashboard.resetAllData')}
+        message={t('dashboard.resetAllDataMsg')}
+        confirmLabel={t('dashboard.deleteEverything')}
         confirmDestructive
         onConfirm={async () => {
           setShowResetConfirm(false);

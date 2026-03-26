@@ -8,6 +8,7 @@ import { getCategories } from '../lib/storage';
 import { formatCurrency } from '../lib/format';
 import { exportExpenses } from '../lib/exportData';
 import { CategoryIcon } from '../components/CategoryIcon';
+import { useLocale } from '../hooks/useLocale';
 import type { Category } from '../types';
 
 export function Reports() {
@@ -15,6 +16,7 @@ export function Reports() {
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
   const navigate = useNavigate();
+  const { t } = useLocale();
   const expenses = getExpenses();
   const settings = getSettings();
 
@@ -47,7 +49,7 @@ export function Reports() {
     });
   }, [expenses, filter, stats.periodStart, stats.periodEnd, settings.monthStartDay, settings.dateMode]);
 
-  const topCatLabel = getCategories().find(c => c.key === stats.topCategory)?.label || stats.topCategory;
+  const topCatLabel = getCategories().find(c => c.key === stats.topCategory)?.label || (stats.topCategory === 'None' ? t('common.none') : stats.topCategory);
   const topCatColor = getCategories().find(c => c.key === stats.topCategory)?.color;
   const allCategories = getCategories();
 
@@ -62,10 +64,10 @@ export function Reports() {
   const hasData = filter !== 'custom' || (customStart && customEnd);
 
   const filters: { key: StatsFilterPeriod; label: string }[] = [
-    { key: 'today', label: 'Today' },
-    { key: 'week', label: 'Week' },
-    { key: 'month', label: 'Month' },
-    { key: 'custom', label: 'Custom' },
+    { key: 'today', label: t('reports.today') },
+    { key: 'week', label: t('reports.week') },
+    { key: 'month', label: t('reports.month') },
+    { key: 'custom', label: t('reports.custom') },
   ];
 
   return (
@@ -78,13 +80,13 @@ export function Reports() {
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="font-headline font-bold text-2xl text-on-primary-fixed flex-grow">Reports</h1>
+        <h1 className="font-headline font-bold text-2xl text-on-primary-fixed flex-grow">{t('reports.title')}</h1>
         <button
           onClick={() => exportExpenses(stats.filteredExpenses, stats, filters.find(f => f.key === filter)!.label)}
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-primary-fixed font-semibold text-sm transition-colors"
         >
           <span className="material-symbols-outlined text-lg">download</span>
-          Export
+          {t('reports.export')}
         </button>
       </div>
 
@@ -109,7 +111,7 @@ export function Reports() {
       {filter === 'custom' && (
         <div className="flex gap-3 mb-6">
           <div className="flex-1">
-            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-1">From</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-1">{t('reports.from')}</label>
             <input
               type="date"
               value={customStart}
@@ -118,7 +120,7 @@ export function Reports() {
             />
           </div>
           <div className="flex-1">
-            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-1">To</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-1">{t('reports.to')}</label>
             <input
               type="date"
               value={customEnd}
@@ -133,7 +135,7 @@ export function Reports() {
       {filter === 'custom' && (!customStart || !customEnd) && (
         <div className="bg-surface-container-lowest rounded-xl p-4 mb-6 flex items-center gap-3">
           <span className="material-symbols-outlined text-on-surface-variant">info</span>
-          <p className="text-on-surface-variant text-sm">Select a start and end date to view your report.</p>
+          <p className="text-on-surface-variant text-sm">{t('reports.customHint')}</p>
         </div>
       )}
 
@@ -141,17 +143,17 @@ export function Reports() {
         <>
           {/* ── Section 1: Overview Stats ── */}
           <div className="grid grid-cols-2 gap-3 mb-6">
-            <StatsCard label="Total spent" value={formatCurrency(stats.totalSpent)} color="#E040FB" />
-            <StatsCard label="Average per day" value={formatCurrency(stats.avgPerDay)} color="#4E7CFF" />
-            <StatsCard label="Highest day" value={formatCurrency(stats.highestDay)} color="#FF6B35" />
-            <StatsCard label="Top category" value={topCatLabel} color={topCatColor} />
+            <StatsCard label={t('reports.totalSpent')} value={formatCurrency(stats.totalSpent)} color="#E040FB" />
+            <StatsCard label={t('reports.avgPerDay')} value={formatCurrency(stats.avgPerDay)} color="#4E7CFF" />
+            <StatsCard label={t('reports.highestDay')} value={formatCurrency(stats.highestDay)} color="#FF6B35" />
+            <StatsCard label={t('reports.topCategory')} value={topCatLabel} color={topCatColor} />
           </div>
 
           {/* ── Section 2: Budget Comparison ── */}
           {settings.budgetAmount > 0 && (
             <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant">Budget usage</h3>
+                <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant">{t('reports.budgetUsage')}</h3>
                 <span className={`text-xs font-bold ${budgetPct > 100 ? 'text-error' : 'text-on-tertiary-container'}`}>
                   {Math.round(budgetPct)}%
                 </span>
@@ -177,25 +179,25 @@ export function Reports() {
           <div className="flex gap-3 mb-6">
             <div className="flex-1 bg-surface-container-lowest rounded-xl p-4 text-center">
               <p className="font-headline font-bold text-xl text-on-primary-fixed">{stats.expenseCount}</p>
-              <p className="text-on-surface-variant text-xs font-semibold">Expenses</p>
+              <p className="text-on-surface-variant text-xs font-semibold">{t('reports.expenses')}</p>
             </div>
             <div className="flex-1 bg-surface-container-lowest rounded-xl p-4 text-center">
               <p className="font-headline font-bold text-xl text-on-primary-fixed">{stats.daysDiff}</p>
-              <p className="text-on-surface-variant text-xs font-semibold">Days</p>
+              <p className="text-on-surface-variant text-xs font-semibold">{t('reports.days')}</p>
             </div>
             {trendPct !== null && (
               <div className="flex-1 bg-surface-container-lowest rounded-xl p-4 text-center">
                 <p className={`font-headline font-bold text-xl ${trendPct > 0 ? 'text-error' : 'text-on-tertiary-container'}`}>
                   {trendPct > 0 ? '+' : ''}{Math.round(trendPct)}%
                 </p>
-                <p className="text-on-surface-variant text-xs font-semibold">vs. prev</p>
+                <p className="text-on-surface-variant text-xs font-semibold">{t('reports.vsPrev')}</p>
               </div>
             )}
           </div>
 
           {/* ── Section 4: Spending Chart ── */}
           <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
-            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">Spending over time</h3>
+            <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">{t('reports.spendingOverTime')}</h3>
             {stats.chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={stats.chartData}>
@@ -222,7 +224,7 @@ export function Reports() {
                     <div key={i} className="flex-1 bg-surface-container rounded animate-pulse" style={{ height: `${h}%` }} />
                   ))}
                 </div>
-                <p className="text-on-surface-variant text-sm text-center">Start adding expenses to see your spending trends</p>
+                <p className="text-on-surface-variant text-sm text-center">{t('reports.emptyChart')}</p>
               </div>
             )}
           </div>
@@ -230,7 +232,7 @@ export function Reports() {
           {/* ── Section 5: Category Breakdown ── */}
           {stats.categoryBreakdown.length > 0 && (
             <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
-              <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">By category</h3>
+              <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">{t('reports.byCategory')}</h3>
               <div className="space-y-3">
                 {stats.categoryBreakdown.map(cat => {
                   const info = allCategories.find(c => c.key === cat.category);
@@ -252,9 +254,9 @@ export function Reports() {
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-on-surface-variant text-xs">{cat.count} expense{cat.count !== 1 ? 's' : ''}</span>
+                            <span className="text-on-surface-variant text-xs">{t('reports.expenseCount', { count: cat.count })}</span>
                             {isOver ? (
-                              <span className="text-error text-xs font-semibold">over budget</span>
+                              <span className="text-error text-xs font-semibold">{t('reports.overBudget')}</span>
                             ) : (
                               <span className="text-on-surface-variant text-xs">{Math.round(pct)}%</span>
                             )}
@@ -277,16 +279,16 @@ export function Reports() {
           {/* ── Section 6: Recurring vs One-time ── */}
           {stats.recurringTotal > 0 && (
             <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
-              <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">Recurring vs one-time</h3>
+              <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">{t('reports.recurVsOneTime')}</h3>
               <div className="flex gap-3 mb-3">
                 <div className="flex-1 text-center">
                   <p className="font-headline font-bold text-lg text-on-primary-fixed">{formatCurrency(stats.recurringTotal)}</p>
-                  <p className="text-on-surface-variant text-xs font-semibold">Recurring</p>
+                  <p className="text-on-surface-variant text-xs font-semibold">{t('reports.recurring')}</p>
                 </div>
                 <div className="w-px bg-outline-variant/30" />
                 <div className="flex-1 text-center">
                   <p className="font-headline font-bold text-lg text-on-primary-fixed">{formatCurrency(stats.oneTimeTotal)}</p>
-                  <p className="text-on-surface-variant text-xs font-semibold">One-time</p>
+                  <p className="text-on-surface-variant text-xs font-semibold">{t('reports.oneTime')}</p>
                 </div>
               </div>
               {/* Stacked bar */}
@@ -301,8 +303,8 @@ export function Reports() {
                 />
               </div>
               <div className="flex justify-between mt-2 text-xs text-on-surface-variant">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-on-tertiary-container" /> Recurring</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary-container" /> One-time</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-on-tertiary-container" /> {t('reports.recurring')}</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary-container" /> {t('reports.oneTime')}</span>
               </div>
             </div>
           )}
@@ -311,7 +313,7 @@ export function Reports() {
           {stats.topExpenses.length > 0 && (
             <div className="bg-surface-container-lowest rounded-xl p-5 mb-6">
               <h3 className="text-xs font-semibold tracking-wide text-on-surface-variant mb-4">
-                Top expenses ({Math.min(stats.topExpenses.length, 10)})
+                {t('reports.topExpenses', { count: Math.min(stats.topExpenses.length, 10) })}
               </h3>
               <div className="space-y-3">
                 {stats.topExpenses.map((exp, idx) => {

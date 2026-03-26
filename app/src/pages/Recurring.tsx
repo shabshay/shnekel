@@ -1,71 +1,76 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { RecurringExpense, RecurringFrequency, Category } from '../types';
-import { getCategories } from '../lib/storage';
-import { CategoryIcon } from '../components/CategoryIcon';
-import { ConfirmDialog } from '../components/ConfirmDialog';
-import { formatCurrency } from '../lib/format';
-import { isSharedMode } from '../lib/context';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import type { RecurringExpense, RecurringFrequency, Category } from '../types'
+import { getCategories } from '../lib/storage'
+import { CategoryIcon } from '../components/CategoryIcon'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { formatCurrency } from '../lib/format'
+import { isSharedMode } from '../lib/context'
+import { useLocale } from '../hooks/useLocale'
 import {
   getRecurringExpenses,
   addRecurringExpense,
   updateRecurringExpense,
   deleteRecurringExpense,
-} from '../lib/storage';
-
-const FREQ_OPTIONS: { key: RecurringFrequency; label: string; icon: string }[] = [
-  { key: 'daily', label: 'Daily', icon: 'calendar_today' },
-  { key: 'weekly', label: 'Weekly', icon: 'date_range' },
-  { key: 'monthly', label: 'Monthly', icon: 'calendar_month' },
-];
-
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+} from '../lib/storage'
 
 export function Recurring() {
-  const navigate = useNavigate();
-  const shared = isSharedMode();
-  const [items, setItems] = useState<RecurringExpense[]>(getRecurringExpenses);
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<RecurringExpense | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<RecurringExpense | null>(null);
+  const navigate = useNavigate()
+  const { t } = useLocale()
+  const shared = isSharedMode()
+  const [items, setItems] = useState<RecurringExpense[]>(getRecurringExpenses)
+  const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<RecurringExpense | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<RecurringExpense | null>(null)
 
   // Form state
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState<Category>('bills');
-  const [description, setDescription] = useState('');
-  const [frequency, setFrequency] = useState<RecurringFrequency>('monthly');
-  const [dayOfMonth, setDayOfMonth] = useState(1);
-  const [dayOfWeek, setDayOfWeek] = useState(1);
+  const [amount, setAmount] = useState('')
+  const [category, setCategory] = useState<Category>('bills')
+  const [description, setDescription] = useState('')
+  const [frequency, setFrequency] = useState<RecurringFrequency>('monthly')
+  const [dayOfMonth, setDayOfMonth] = useState(1)
+  const [dayOfWeek, setDayOfWeek] = useState(1)
+
+  const FREQ_OPTIONS: { key: RecurringFrequency; label: string; icon: string }[] = [
+    { key: 'daily', label: t('period.daily'), icon: 'calendar_today' },
+    { key: 'weekly', label: t('period.weekly'), icon: 'date_range' },
+    { key: 'monthly', label: t('period.monthly'), icon: 'calendar_month' },
+  ]
+
+  const DAYS_OF_WEEK = [
+    t('weekdays.sun'), t('weekdays.mon'), t('weekdays.tue'), t('weekdays.wed'),
+    t('weekdays.thu'), t('weekdays.fri'), t('weekdays.sat'),
+  ]
 
   const openForm = (item?: RecurringExpense) => {
     if (item) {
-      setEditing(item);
-      setAmount(String(item.amount));
-      setCategory(item.category);
-      setDescription(item.description);
-      setFrequency(item.frequency);
-      setDayOfMonth(item.dayOfMonth ?? 1);
-      setDayOfWeek(item.dayOfWeek ?? 1);
+      setEditing(item)
+      setAmount(String(item.amount))
+      setCategory(item.category)
+      setDescription(item.description)
+      setFrequency(item.frequency)
+      setDayOfMonth(item.dayOfMonth ?? 1)
+      setDayOfWeek(item.dayOfWeek ?? 1)
     } else {
-      setEditing(null);
-      setAmount('');
-      setCategory('bills');
-      setDescription('');
-      setFrequency('monthly');
-      setDayOfMonth(1);
-      setDayOfWeek(1);
+      setEditing(null)
+      setAmount('')
+      setCategory('bills')
+      setDescription('')
+      setFrequency('monthly')
+      setDayOfMonth(1)
+      setDayOfWeek(1)
     }
-    setShowForm(true);
-  };
+    setShowForm(true)
+  }
 
   const closeForm = () => {
-    setShowForm(false);
-    setEditing(null);
-  };
+    setShowForm(false)
+    setEditing(null)
+  }
 
   const handleSave = () => {
-    const num = parseFloat(amount);
-    if (!num || num <= 0 || !description.trim()) return;
+    const num = parseFloat(amount)
+    if (!num || num <= 0 || !description.trim()) return
 
     if (editing) {
       const updated: RecurringExpense = {
@@ -76,8 +81,8 @@ export function Recurring() {
         frequency,
         dayOfMonth: frequency === 'monthly' ? dayOfMonth : undefined,
         dayOfWeek: frequency === 'weekly' ? dayOfWeek : undefined,
-      };
-      setItems(updateRecurringExpense(updated));
+      }
+      setItems(updateRecurringExpense(updated))
     } else {
       const item: RecurringExpense = {
         id: crypto.randomUUID(),
@@ -89,31 +94,31 @@ export function Recurring() {
         dayOfWeek: frequency === 'weekly' ? dayOfWeek : undefined,
         active: true,
         createdAt: new Date().toISOString(),
-      };
-      setItems(addRecurringExpense(item));
+      }
+      setItems(addRecurringExpense(item))
     }
-    closeForm();
-  };
+    closeForm()
+  }
 
   const handleToggle = (item: RecurringExpense) => {
-    const updated = { ...item, active: !item.active };
-    setItems(updateRecurringExpense(updated));
-  };
+    const updated = { ...item, active: !item.active }
+    setItems(updateRecurringExpense(updated))
+  }
 
   const handleDelete = () => {
     if (deleteTarget) {
-      setItems(deleteRecurringExpense(deleteTarget.id));
-      setDeleteTarget(null);
+      setItems(deleteRecurringExpense(deleteTarget.id))
+      setDeleteTarget(null)
     }
-  };
+  }
 
   const getScheduleLabel = (item: RecurringExpense) => {
     switch (item.frequency) {
-      case 'daily': return 'Every day';
-      case 'weekly': return `Every ${DAYS_OF_WEEK[item.dayOfWeek ?? 1]}`;
-      case 'monthly': return `${item.dayOfMonth ?? 1}${getOrdinal(item.dayOfMonth ?? 1)} of each month`;
+      case 'daily': return t('recurring.everyDay')
+      case 'weekly': return `Every ${DAYS_OF_WEEK[item.dayOfWeek ?? 1]}`
+      case 'monthly': return `${item.dayOfMonth ?? 1}${getOrdinal(item.dayOfMonth ?? 1)} of each month`
     }
-  };
+  }
 
   if (shared) {
     return (
@@ -122,15 +127,15 @@ export function Recurring() {
           <button onClick={() => navigate('/')} className="w-10 h-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-on-surface-variant">
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
-          <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Recurring</h1>
+          <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">{t('recurring.title')}</h1>
         </div>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <span className="material-symbols-outlined text-4xl text-outline-variant mb-4">lock</span>
-          <h2 className="font-headline font-bold text-lg text-on-primary-fixed mb-2">Personal only</h2>
-          <p className="text-on-surface-variant text-sm">Recurring expenses are managed from your personal budget. Switch back to your budget to manage them.</p>
+          <h2 className="font-headline font-bold text-lg text-on-primary-fixed mb-2">{t('recurring.personalOnly')}</h2>
+          <p className="text-on-surface-variant text-sm">{t('recurring.personalOnlyMsg')}</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -145,8 +150,8 @@ export function Recurring() {
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
-            <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Recurring</h1>
-            <p className="text-on-surface-variant text-sm">Auto-added expenses</p>
+            <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">{t('recurring.title')}</h1>
+            <p className="text-on-surface-variant text-sm">{t('recurring.subtitle')}</p>
           </div>
         </div>
         <button
@@ -161,13 +166,13 @@ export function Recurring() {
       {items.length === 0 ? (
         <div className="text-center py-16">
           <span className="material-symbols-outlined text-4xl text-outline-variant mb-4">repeat</span>
-          <p className="text-on-surface-variant font-medium">No recurring expenses</p>
-          <p className="text-on-surface-variant text-sm mt-1">Add bills, subscriptions, or other regular costs</p>
+          <p className="text-on-surface-variant font-medium">{t('recurring.noRecurring')}</p>
+          <p className="text-on-surface-variant text-sm mt-1">{t('recurring.noRecurringHint')}</p>
           <button
             onClick={() => openForm()}
             className="mt-6 px-6 py-3 bg-primary-container text-on-primary font-headline font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
           >
-            Add recurring expense
+            {t('recurring.addRecurring')}
           </button>
         </div>
       ) : (
@@ -213,12 +218,12 @@ export function Recurring() {
           <div className="relative bg-surface-container-lowest rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-8 pb-10 z-10 max-h-[90vh] overflow-y-auto">
             <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
             <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-6">
-              {editing ? 'Edit Recurring' : 'New Recurring Expense'}
+              {editing ? t('recurring.editRecurring') : t('recurring.newRecurring')}
             </h2>
 
             {/* Amount */}
             <div className="bg-surface rounded-xl p-5 mb-4">
-              <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Amount</label>
+              <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('recurring.amount')}</label>
               <div className="flex items-baseline gap-1">
                 <span className="font-headline text-on-primary-fixed font-bold text-2xl">₪</span>
                 <input
@@ -264,7 +269,7 @@ export function Recurring() {
             </div>
 
             {/* Frequency */}
-            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Frequency</label>
+            <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('recurring.frequency')}</label>
             <div className="flex gap-2 mb-4">
               {FREQ_OPTIONS.map(f => (
                 <button
@@ -283,7 +288,7 @@ export function Recurring() {
             {/* Day picker */}
             {frequency === 'monthly' && (
               <div className="mb-4">
-                <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Day of month</label>
+                <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('recurring.dayOfMonth')}</label>
                 <select
                   value={dayOfMonth}
                   onChange={e => setDayOfMonth(parseInt(e.target.value))}
@@ -298,7 +303,7 @@ export function Recurring() {
 
             {frequency === 'weekly' && (
               <div className="mb-4">
-                <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">Day of week</label>
+                <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-2">{t('recurring.dayOfWeek')}</label>
                 <div className="grid grid-cols-7 gap-1">
                   {DAYS_OF_WEEK.map((label, i) => (
                     <button
@@ -322,7 +327,7 @@ export function Recurring() {
               className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40 mt-4"
             >
               <span className="material-symbols-outlined filled">{editing ? 'check_circle' : 'add_circle'}</span>
-              {editing ? 'Save Changes' : 'Add Recurring'}
+              {editing ? t('recurring.saveChanges') : t('recurring.addRecurringBtn')}
             </button>
           </div>
         </div>
@@ -330,23 +335,23 @@ export function Recurring() {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title="Delete recurring expense?"
-        message={deleteTarget ? `Remove "${deleteTarget.description}"? Future expenses will no longer be auto-added.` : ''}
+        title={t('recurring.deleteRecurring')}
+        message={deleteTarget ? t('recurring.deleteRecurringMsg', { desc: deleteTarget.description }) : ''}
         confirmLabel="Delete"
         confirmDestructive
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
-  );
+  )
 }
 
 function getOrdinal(n: number): string {
-  if (n >= 11 && n <= 13) return 'th';
+  if (n >= 11 && n <= 13) return 'th'
   switch (n % 10) {
-    case 1: return 'st';
-    case 2: return 'nd';
-    case 3: return 'rd';
-    default: return 'th';
+    case 1: return 'st'
+    case 2: return 'nd'
+    case 3: return 'rd'
+    default: return 'th'
   }
 }

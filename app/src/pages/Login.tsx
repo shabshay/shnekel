@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useLocale } from '../hooks/useLocale';
 import { CoinLogo } from '../components/CoinLogo';
 
 export function Login() {
   const { signInWithEmail, verifyOtp } = useAuth();
+  const { t } = useLocale();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -110,10 +112,10 @@ export function Login() {
           <div className="flex flex-col items-center mb-12">
             <CoinLogo size="xl" className="mb-4" />
             <h1 className="font-headline font-black text-primary-container text-4xl tracking-tight mb-2">
-              Shnekel
+              {t('app.name')}
             </h1>
             <p className="text-on-surface-variant text-base">
-              Spend like it's cash.
+              {t('app.tagline')}
             </p>
           </div>
 
@@ -124,10 +126,10 @@ export function Login() {
                 <span className="material-symbols-outlined filled text-on-tertiary-container text-3xl">mail</span>
               </div>
               <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-2">
-                Enter the code
+                {t('login.enterCode')}
               </h2>
               <p className="text-on-surface-variant text-sm mb-8">
-                We sent a 6-digit code to <span className="font-semibold text-on-primary-fixed">{email}</span>
+                {t('login.codeSentTo')}<span className="font-semibold text-on-primary-fixed">{email}</span>
               </p>
 
               {/* OTP input */}
@@ -158,12 +160,12 @@ export function Login() {
               {loading && (
                 <div className="flex items-center justify-center gap-2 mb-4 text-on-surface-variant">
                   <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
-                  <span className="text-sm">Verifying...</span>
+                  <span className="text-sm">{t('login.verifying')}</span>
                 </div>
               )}
 
               <p className="text-on-surface-variant text-xs mb-4">
-                You can also tap the magic link in the email.
+                {t('login.magicLinkHint')}
               </p>
 
               <div className="flex items-center justify-center gap-4">
@@ -172,14 +174,14 @@ export function Login() {
                   disabled={loading}
                   className="font-headline font-semibold text-sm text-on-tertiary-container hover:opacity-80 transition-colors disabled:opacity-40"
                 >
-                  Resend code
+                  {t('login.resendCode')}
                 </button>
                 <span className="text-outline">|</span>
                 <button
                   onClick={() => { setSent(false); setEmail(''); setOtp(['', '', '', '', '', '']); setError(''); }}
                   className="font-headline font-semibold text-sm text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
-                  Different email
+                  {t('login.differentEmail')}
                 </button>
               </div>
             </div>
@@ -187,7 +189,7 @@ export function Login() {
             /* Login form */
             <form onSubmit={handleSubmit}>
               <label className="text-xs font-semibold tracking-wide text-on-surface-variant block mb-3">
-                Email address
+                {t('login.emailLabel')}
               </label>
               <input
                 type="email"
@@ -215,7 +217,7 @@ export function Login() {
                 ) : (
                   <>
                     <span className="material-symbols-outlined">login</span>
-                    Sign in
+                    {t('login.signIn')}
                   </>
                 )}
               </button>
@@ -225,7 +227,7 @@ export function Login() {
       </div>
 
       <p className="text-center text-outline text-xs pb-8 px-6">
-        No password needed. We'll email you a code to sign in.
+        {t('login.footer')}
       </p>
     </div>
   );

@@ -114,6 +114,30 @@ body {
   animation: fade-in 0.2s ease-out;
 }
 
+/* ── RTL Support ──────────────────────────────────────── */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+/* Flip search icon position in RTL */
+[dir="rtl"] .search-icon-left {
+  left: auto;
+  right: 0.75rem;
+}
+
+/* Number inputs should stay LTR for readability */
+[dir="rtl"] input[type="number"],
+[dir="rtl"] input[inputmode="decimal"],
+[dir="rtl"] input[inputmode="numeric"] {
+  direction: ltr;
+  text-align: right;
+}
+
+/* Currency amounts stay LTR */
+[dir="rtl"] .font-headline {
+  unicode-bidi: plaintext;
+}
+
 /* Swipe gesture support */
 .swipe-container {
   touch-action: pan-y;

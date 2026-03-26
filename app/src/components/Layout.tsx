@@ -1,17 +1,20 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { CoinLogo } from './CoinLogo';
+import { useLocale } from '../hooks/useLocale'
 
 const leftNav = [
-  { to: '/', icon: 'home', label: 'Home' },
-  { to: '/recurring', icon: 'repeat', label: 'Recurring' },
+  { to: '/', icon: 'home', key: 'nav.home' },
+  { to: '/recurring', icon: 'repeat', key: 'nav.recurring' },
 ];
 
 const rightNav = [
-  { to: '/reports', icon: 'monitoring', label: 'Reports' },
-  { to: '/import', icon: 'upload_file', label: 'Import' },
+  { to: '/reports', icon: 'monitoring', key: 'nav.reports' },
+  { to: '/import', icon: 'upload_file', key: 'nav.import' },
 ];
 
 export function Layout() {
+  const { t } = useLocale()
+
   return (
     <div className="min-h-dvh pb-24">
       <Outlet />
@@ -38,7 +41,7 @@ export function Layout() {
                     {item.icon}
                   </span>
                   <span className="font-headline font-medium text-[9px] tracking-wide mt-0.5">
-                    {item.label}
+                    {t(item.key)}
                   </span>
                   {isActive && <div className="w-1 h-1 rounded-full bg-on-tertiary-container mt-0.5" />}
                 </>
@@ -55,7 +58,7 @@ export function Layout() {
               <CoinLogo size="sm" />
             </div>
             <span className="font-headline font-semibold text-[9px] tracking-wide mt-1 text-on-primary-fixed">
-              Add
+              {t('nav.add')}
             </span>
           </NavLink>
 
@@ -78,7 +81,7 @@ export function Layout() {
                     {item.icon}
                   </span>
                   <span className="font-headline font-medium text-[9px] tracking-wide mt-0.5">
-                    {item.label}
+                    {t(item.key)}
                   </span>
                   {isActive && <div className="w-1 h-1 rounded-full bg-on-tertiary-container mt-0.5" />}
                 </>

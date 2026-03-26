@@ -3,6 +3,7 @@ import type { Category, Expense } from '../types';
 import { getCategories } from '../lib/storage';
 import { supabase } from '../lib/supabase';
 import { autoCategorize } from '../lib/autoCategorize';
+import { useLocale } from '../hooks/useLocale';
 
 interface AddExpenseModalProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface AddExpenseModalProps {
 }
 
 export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }: AddExpenseModalProps) {
+  const { t } = useLocale()
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<Category>('food');
   const [description, setDescription] = useState('');
@@ -118,12 +120,12 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
         <div className="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6 sm:hidden" />
 
         <h2 className="font-headline font-bold text-xl text-on-primary-fixed mb-8">
-          {isEdit ? 'Edit Expense' : 'Add Expense'}
+          {isEdit ? t('expense.editExpense') : t('expense.addExpense')}
         </h2>
 
         {/* Amount input + Camera */}
         <div className="bg-surface rounded-xl p-6 mb-6">
-          <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-3">Amount</label>
+          <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-3">{t('expense.amount')}</label>
           <div className="flex items-center gap-3">
             <div className="flex items-baseline gap-1 flex-grow">
               <span className="font-headline text-on-primary-fixed font-bold text-3xl">₪</span>
@@ -155,7 +157,7 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
         </div>
 
         {/* Category grid */}
-        <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-3">Category</label>
+        <label className="text-on-surface-variant text-xs font-semibold tracking-wide block mb-3">{t('expense.category')}</label>
         <div className="grid grid-cols-4 gap-2 mb-6">
           {getCategories().map(cat => (
             <button
@@ -180,13 +182,13 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
           type="text"
           value={description}
           onChange={e => setDescription(e.target.value)}
-          placeholder="Description (optional)"
+          placeholder={t('expense.descriptionOpt')}
           className="w-full bg-surface rounded-xl px-4 py-3 font-body text-on-surface border-none outline-none placeholder:text-outline-variant mb-1"
         />
         {suggestedCategory && !userPickedCategory && (
           <p className="text-on-tertiary-container text-xs font-semibold mb-3 ml-1 flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">auto_awesome</span>
-            Suggested: {suggestedCategory}
+            {t('expense.suggested')} {suggestedCategory}
           </p>
         )}
         {!suggestedCategory && <div className="mb-3" />}
@@ -220,7 +222,7 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
         <textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="Add a note (optional)"
+          placeholder={t('expense.addNote')}
           rows={2}
           className="w-full bg-surface rounded-xl px-4 py-3 font-body text-sm text-on-surface border-none outline-none placeholder:text-outline-variant resize-none mb-4"
         />
@@ -232,7 +234,7 @@ export function AddExpenseModal({ open, onClose, onAdd, onUpdate, editExpense }:
           className="w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-lg rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary-container/10 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined filled">{isEdit ? 'check_circle' : 'add_circle'}</span>
-          {isEdit ? 'Save Changes' : 'Save Expense'}
+          {isEdit ? t('expense.saveChanges') : t('expense.saveExpense')}
         </button>
       </div>
     </div>
