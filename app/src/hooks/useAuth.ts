@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { resetContext } from '../lib/context';
 
 interface AuthState {
   session: Session | null;
@@ -62,6 +63,8 @@ export function useAuth(): AuthState {
 
   const signOut = useCallback(async () => {
     if (!supabase) return;
+    // Reset to personal context before signing out
+    resetContext();
     await supabase.auth.signOut();
     setSession(null);
   }, []);

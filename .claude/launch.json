@@ -3,10 +3,10 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "/opt/homebrew/bin/node",
-      "runtimeArgs": ["./node_modules/.bin/vite", "--port", "5173"],
+      "runtimeExecutable": "/opt/homebrew/bin/npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5173"],
       "port": 5173,
-      "cwd": "app"
+      "cwd": "/Users/shaysh/Documents/Shay/Shnekel/app"
     }
   ]
 }

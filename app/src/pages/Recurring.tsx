@@ -5,6 +5,7 @@ import { getCategories } from '../lib/storage';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatCurrency } from '../lib/format';
+import { isSharedMode } from '../lib/context';
 import {
   getRecurringExpenses,
   addRecurringExpense,
@@ -22,6 +23,7 @@ const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function Recurring() {
   const navigate = useNavigate();
+  const shared = isSharedMode();
   const [items, setItems] = useState<RecurringExpense[]>(getRecurringExpenses);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<RecurringExpense | null>(null);
@@ -112,6 +114,24 @@ export function Recurring() {
       case 'monthly': return `${item.dayOfMonth ?? 1}${getOrdinal(item.dayOfMonth ?? 1)} of each month`;
     }
   };
+
+  if (shared) {
+    return (
+      <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => navigate('/')} className="w-10 h-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-on-surface-variant">
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1 className="font-headline font-bold text-2xl text-on-primary-fixed">Recurring</h1>
+        </div>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <span className="material-symbols-outlined text-4xl text-outline-variant mb-4">lock</span>
+          <h2 className="font-headline font-bold text-lg text-on-primary-fixed mb-2">Personal only</h2>
+          <p className="text-on-surface-variant text-sm">Recurring expenses are managed from your personal budget. Switch back to your budget to manage them.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">

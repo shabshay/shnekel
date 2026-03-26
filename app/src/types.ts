@@ -63,6 +63,22 @@ export const DEFAULT_CATEGORIES: CategoryInfo[] = [
 // Backward compat alias
 export const CATEGORIES = DEFAULT_CATEGORIES;
 
+// ─── Shared Budgets ─────────────────────────────────────────────
+
+export interface SharedBudget {
+  id: string;
+  ownerId: string;
+  ownerEmail: string;
+  memberId?: string;
+  memberEmail: string;
+  status: 'pending' | 'accepted' | 'revoked';
+  createdAt: string;
+}
+
+export type AccountContext =
+  | { type: 'personal' }
+  | { type: 'shared'; ownerId: string; ownerEmail: string; budgetId: string };
+
 export const AVAILABLE_ICONS = [
   'restaurant', 'local_grocery_store', 'directions_car', 'shopping_bag', 'sports_esports', 'receipt_long',
   'favorite', 'more_horiz', 'child_care', 'pets', 'home', 'school', 'flight',

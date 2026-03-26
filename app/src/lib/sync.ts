@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { Settings, Expense } from '../types';
+import { getActiveContext } from './context';
 
 const SYNC_QUEUE_KEY = 'shnekel_sync_queue';
 const MIGRATED_KEY = 'shnekel_migrated';
@@ -10,6 +11,20 @@ interface SyncOp {
   type: 'upsert_settings' | 'upsert_expense' | 'delete_expense' | 'bulk_insert_expenses';
   payload: unknown;
   timestamp: number;
+  targetUserId?: string; // override user_id for shared mode writes
+}
+
+/**
+ * Returns the user_id to use for sync operations.
+ * In personal mode: the authenticated user's id.
+ * In shared mode: the shared budget owner's id.
+ */
+async function getTargetUserId(): Promise<string | null> {
+  if (!supabase) return null;
+  const ctx = getActiveContext();
+  if (ctx.type === 'shared') return ctx.ownerId;
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id ?? null;
 }
 
 // ─── Queue ──────────────────────────────────────────────────────
@@ -25,6 +40,11 @@ function saveQueue(queue: SyncOp[]) {
 
 export function enqueueSync(op: SyncOp) {
   if (!supabase) return;
+  // Tag with targetUserId if in shared mode so queued ops flush to the right account
+  const ctx = getActiveContext();
+  if (ctx.type === 'shared' && !op.targetUserId) {
+    op.targetUserId = ctx.ownerId;
+  }
   const queue = getQueue();
   queue.push(op);
   saveQueue(queue);
@@ -40,7 +60,8 @@ let retryDelay = 1000;
 async function processOp(op: SyncOp): Promise<boolean> {
   if (!supabase) return true; // skip if no supabase
 
-  const userId = (await supabase.auth.getUser()).data.user?.id;
+  // Use op-level override (for queued shared writes), context, or auth user
+  const userId = op.targetUserId ?? await getTargetUserId();
   if (!userId) return false;
 
   try {
@@ -151,18 +172,33 @@ export async function flushSync() {
 
 // ─── Pull from Supabase ─────────────────────────────────────────
 
+/**
+ * Pull data from Supabase for a specific user ID.
+ * Used during context switches to load shared data.
+ */
+export async function pullForContext(targetUserId: string): Promise<boolean> {
+  return pullFromSupabaseForUser(targetUserId);
+}
+
 export async function pullFromSupabase(): Promise<boolean> {
+  const targetId = await getTargetUserId();
+  if (!targetId) return false;
+  return pullFromSupabaseForUser(targetId);
+}
+
+async function pullFromSupabaseForUser(userId: string): Promise<boolean> {
   if (!supabase) return false;
 
+  // Verify we're authenticated
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
 
   try {
-    // Pull settings
+    // Pull settings for target user
     const { data: remoteSettings } = await supabase
       .from('settings')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (remoteSettings) {
@@ -181,11 +217,11 @@ export async function pullFromSupabase(): Promise<boolean> {
       localStorage.setItem('shnekel_settings', JSON.stringify(settings));
     }
 
-    // Pull expenses
+    // Pull expenses for target user
     const { data: remoteExpenses } = await supabase
       .from('expenses')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('date', { ascending: false });
 
     if (remoteExpenses && remoteExpenses.length > 0) {

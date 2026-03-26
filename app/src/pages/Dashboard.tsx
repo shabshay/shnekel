@@ -13,6 +13,8 @@ import { getCategories } from '../lib/storage';
 import { CategoryBreakdown } from '../components/CategoryBreakdown';
 import { CoinLogo } from '../components/CoinLogo';
 import { isAdminEmail } from '../lib/admin';
+import { SharedBudgetManager } from '../components/SharedBudgetManager';
+import { useAccountContext } from '../hooks/useAccountContext';
 
 interface DashboardProps {
   settings: Settings;
@@ -44,6 +46,8 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
+  const [showSharedBudgets, setShowSharedBudgets] = useState(false);
+  const { activeContext, isSharedMode, switchToPersonal } = useAccountContext();
   const navigate = useNavigate();
 
   const filteredExpenses = useMemo(() => {
@@ -258,6 +262,13 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
               {/* Quick links */}
               <div className="space-y-1 pt-2 border-t border-outline-variant/20">
                 <button
+                  onClick={() => { setShowSettings(false); setShowSharedBudgets(true); }}
+                  className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">group</span>
+                  <span className="font-semibold text-sm">Shared budget</span>
+                </button>
+                <button
                   onClick={() => { setShowSettings(false); navigate('/categories'); }}
                   className="w-full flex items-center gap-3 py-3 text-on-surface-variant hover:text-on-primary-fixed transition-colors"
                 >
@@ -304,6 +315,25 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Shared mode banner */}
+      {isSharedMode && activeContext.type === 'shared' && (
+        <div className="bg-tertiary-container/15 border border-tertiary-container/30 rounded-xl p-3 mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-on-tertiary-container text-lg">group</span>
+            <div>
+              <p className="text-on-primary-fixed text-xs font-semibold">Shared budget</p>
+              <p className="text-on-surface-variant text-[10px]">{activeContext.ownerEmail}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => switchToPersonal()}
+            className="text-[10px] font-semibold text-on-tertiary-container bg-tertiary-container/20 rounded-lg px-2.5 py-1 hover:bg-tertiary-container/40 transition-colors"
+          >
+            My budget
+          </button>
         </div>
       )}
 
@@ -446,6 +476,9 @@ export function Dashboard({ settings, onUpdateSettings }: DashboardProps) {
         onUpdate={handleUpdate}
         editExpense={editingExpense}
       />
+
+      {/* Shared budget manager */}
+      <SharedBudgetManager open={showSharedBudgets} onClose={() => setShowSharedBudgets(false)} />
 
       {/* Reset confirm */}
       <ConfirmDialog
